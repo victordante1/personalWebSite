@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Victor Dante | Graphic designer</title>
+  <meta name="description" content="Portfolio of Victor Dante, graphic designer based in Maceió, Brazil.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="shortcut icon" sizes="32x32" type="image/png" href="img/dante site logo.png">
+  <script src="js/main.js" defer></script>
+</head>
+<body data-page="home">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <nav class="nav" data-nav aria-label="Main">
+      <a class="nav__link1" href="index.html" aria-label="Home" title="Home" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/><path d="M10 20v-6h4v6"/></svg></a>
+      <a class="nav__link2" href="sobre.html" aria-label="About me" title="About me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></a>
+      <a class="nav__link3" href="projetos.html" aria-label="Projects" title="Projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5H9l2 2.5h8.5A1.5 1.5 0 0 1 21 9v9.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z"/></svg></a>
+      <a class="nav__link4" href="#contact" aria-label="Contact" title="Contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6.5L20.5 7"/></svg></a>
+    </nav>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="home-title">
+      <div class="hero__inner">
+        <div class="hero__text">
+          <h1 class="display" id="home-title" data-scramble>Hello! <br> </h1>
+          <p class="lead" data-scramble>I'm Victor Dante, a creative developer based in Brazil. I bring together graphic design, UI/UX and front-end development to build digital experiences that look intentional and work smoothly.</p>
+        </div>
+
+        <!-- Bloco único: o "d" (GIF) fica no fluxo e a foto flutua por cima -->
+        <div class="hero__visual">
+          <img class="hero-arrows" src="img/VD setinhas.gif" alt="">
+          <div class="hero-photo" data-transform tabindex="0" role="button" aria-pressed="false"
+               aria-label="Portrait of Victor Dante. Press Enter to resize and move.">
+            <img src="img/picture home victor dante.png" alt="" draggable="false">
+          </div>
+        </div>
+      </div>
+      <div class="hero__foot"><span>Scroll</span><span>Maceió, Brazil</span></div>
+    </section>
+
+    <section class="section" aria-labelledby="home-projects">
+      <div class="container">
+        <div class="projects-head">
+          <div class="projects-head__left">
+            <h2 class="sr-only" id="home-projects">Selected projects</h2>
+          </div>
+          <a class="link-more" href="projetos.html">View more</a>
+        </div>
+        <div class="grid">
+        <article class="card" data-drag tabindex="0" aria-describedby="drag-hint">
+          <div class="card__media ph ph--blue" data-label="Image" aria-hidden="true"></div>
+          <div class="card__body">
+            <h3 class="card__title">Project name</h3>
+            <p class="card__text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.</p>
+            <a class="card__more" href="projeto.html">See more<span class="sr-only">: project 1</span></a>
+          </div>
+        </article>
+        <article class="card" data-drag tabindex="0" aria-describedby="drag-hint">
+          <div class="card__media ph ph--yellow" data-label="Image" aria-hidden="true"></div>
+          <div class="card__body">
+            <h3 class="card__title">Project name</h3>
+            <p class="card__text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.</p>
+            <a class="card__more" href="projeto.html">See more<span class="sr-only">: project 2</span></a>
+          </div>
+        </article>
+        <article class="card" data-drag tabindex="0" aria-describedby="drag-hint">
+          <div class="card__media ph ph--green" data-label="Image" aria-hidden="true"></div>
+          <div class="card__body">
+            <h3 class="card__title">Project name</h3>
+            <p class="card__text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.</p>
+            <a class="card__more" href="projeto.html">See more<span class="sr-only">: project 3</span></a>
+          </div>
+        </article>
+        <article class="card" data-drag tabindex="0" aria-describedby="drag-hint">
+          <div class="card__media ph ph--red" data-label="Image" aria-hidden="true"></div>
+          <div class="card__body">
+            <h3 class="card__title">Project name</h3>
+            <p class="card__text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.</p>
+            <a class="card__more" href="projeto.html">See more<span class="sr-only">: project 4</span></a>
+          </div>
+        </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="contact" id="contact">
+    <div class="contact__inner">
+      <img class="lwt" src="img/bonecos de papel.gif" alt="paper toys with a phrase">
+      <div class="contact__grid">
+        <div>
+          <ul class="info-list">
+            <li class="info"><span class="info__icon__home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6.5L20.5 7"/></svg></span><div><span class="info__label">Email</span><a class="info__value" href="mailto:victordante.designer@gmail.com">victordante.designer@gmail.com</a></div></li>
+            <li class="info"><span class="info__icon__home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg></span><div><span class="info__label">Phone</span><span class="info__value">+55 82 9 9984-7936</span></div></li>
+            <li class="info"><span class="info__icon__home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span><div><span class="info__label">Location</span><span class="info__value">Maceió, Brazil</span></div></li>
+          </ul>
+          <div class="connect">
+            <p class="connect__label">Connect with me</p>
+            <ul class="social">
+              <li><a href="https://www.instagram.com/dantegrid/" aria-label="Instagram">Ig</a></li>
+              <li><a href="https://www.behance.net/victordante1" aria-label="Behance">Be</a></li>
+              <li><a href="https://www.linkedin.com/in/victor-dante/" aria-label="LinkedIn">In</a></li>
+            </ul>
+          </div>
+        </div>
+        <form class="form" data-contact-form data-email="victordante.designer@gmail.com" novalidate>
+          <div class="form__row">
+            <div class="field"><label for="f-name">Your Name</label><input id="f-name" name="name" type="text" autocomplete="name" placeholder="Your name" aria-describedby="e-name"><span class="field__error" id="e-name" data-error-for="name"></span></div>
+            <div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email" placeholder="name@domain.com" aria-describedby="e-email"><span class="field__error" id="e-email" data-error-for="email"></span></div>
+          </div>
+          <div class="field"><label for="f-subject">Subject</label><input id="f-subject" name="subject" type="text" placeholder="What is this about?" aria-describedby="e-subject"><span class="field__error" id="e-subject" data-error-for="subject"></span></div>
+          <div class="field"><label for="f-message">Message</label><textarea id="f-message" name="message" placeholder="Tell me about your project" aria-describedby="e-message"></textarea><span class="field__error" id="e-message" data-error-for="message"></span></div>
+          <button class="btn-home" type="submit">Send message</button>
+          <p class="form__status" data-status role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
