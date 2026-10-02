@@ -2,6 +2,7 @@
    Victor Dante | Portfolio
    1 Navbar que some gradualmente   2 Cards arrastáveis (home)   3 Formulário
    4 Foto do hero com transformação livre   5 Texto que embaralha (duplo clique)
+   6 Identidade da página About (riscar e mover)
    ========================================================================== */
 (() => {
   "use strict";
@@ -561,9 +562,229 @@
     });
   }
 
+  /* 6. IDENTIDADE (ABOUT): RISCAR E MOVER ---------------------------------- */
+  // Dois modos no mesmo elemento [data-id-card]:
+  //  - Riscar (padrão): clicar e arrastar sobre a identidade desenha com uma
+  //    caneta. O traço só aparece em cima do cartão (some nas bordas vazadas).
+  //  - Mover: duplo clique alterna. Aí arrastar leva o cartão pela página.
+  //    Duplo clique de novo, Esc ou clique fora voltam para o modo riscar.
+  //  - Teclado: Enter liga/desliga o modo mover; com ele ligado, setas movem.
+  // Mouse e caneta riscam; toque continua rolando a página.
+  function initIdCard() {
+    const card = document.querySelector("[data-id-card]");
+    if (!card) return;
+    const img = card.querySelector("img");
+
+    const INK = "#111111"; // cor da caneta
+    const BRUSH = 4; // espessura em px de tela
+    const THRESHOLD = 3; // px antes de começar a riscar (clique simples não desenha)
+    const KEY_STEP = 16;
+
+    // O canvas recebe a própria imagem e o traço usa "source-atop": só pinta
+    // onde já existe pixel opaco, então respeita o formato do cartão.
+    const canvas = document.createElement("canvas");
+    canvas.className = "id-card__canvas";
+    canvas.setAttribute("aria-hidden", "true");
+    card.appendChild(canvas);
+    const ctx = canvas.getContext("2d");
+
+    const setup = () => {
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      ctx.drawImage(img, 0, 0);
+      card.classList.add("is-ready");
+    };
+    if (img.complete && img.naturalWidth) setup();
+    else img.addEventListener("load", setup, { once: true });
+
+    /* Modo ---------------------------------------------------------------- */
+    const s = { x: 0, y: 0, r: 0 };
+    let zTop = 20;
+    const isMove = () => card.classList.contains("is-move");
+    const setMove = (on) => {
+      card.classList.toggle("is-move", on);
+      if (on) card.style.zIndex = String(++zTop);
+    };
+
+    const render = () => {
+      card.style.transform =
+        s.x || s.y || s.r ? `translate3d(${s.x}px, ${s.y}px, 0) rotate(${s.r}deg)` : "";
+    };
+
+    // Limites em coordenadas de documento, para o cartão nunca sair da página
+    const getBounds = () => {
+      const rect = card.getBoundingClientRect();
+      const w = card.offsetWidth;
+      const h = card.offsetHeight;
+      const cx = rect.left + rect.width / 2 + window.scrollX;
+      const cy = rect.top + rect.height / 2 + window.scrollY;
+      const restLeft = cx - w / 2 - s.x;
+      const restTop = cy - h / 2 - s.y;
+      return {
+        minX: -restLeft,
+        maxX: document.documentElement.clientWidth - w - restLeft,
+        minY: -restTop,
+        maxY: document.documentElement.scrollHeight - h - restTop,
+      };
+    };
+
+    /* Riscar -------------------------------------------------------------- */
+    let stroke = null;
+    let drag = null;
+    let raf = 0;
+
+    const toCanvas = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const k = canvas.width / rect.width;
+      return { x: (e.clientX - rect.left) * k, y: (e.clientY - rect.top) * k, k };
+    };
+
+    const drawTo = (e) => {
+      const p = toCanvas(e);
+      const mid = { x: (stroke.last.x + p.x) / 2, y: (stroke.last.y + p.y) / 2 };
+      ctx.globalCompositeOperation = "source-atop";
+      ctx.strokeStyle = INK;
+      ctx.lineWidth = BRUSH * p.k;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.beginPath();
+      ctx.moveTo(stroke.mid.x, stroke.mid.y);
+      ctx.quadraticCurveTo(stroke.last.x, stroke.last.y, mid.x, mid.y);
+      ctx.stroke();
+      stroke.last = p;
+      stroke.mid = mid;
+    };
+
+    /* Ponteiro ------------------------------------------------------------ */
+    card.addEventListener("pointerdown", (e) => {
+      if (e.pointerType === "touch") return;
+      if (e.button !== 0) return;
+
+      if (isMove()) {
+        drag = {
+          id: e.pointerId,
+          px: e.clientX,
+          sx: s.x,
+          sy: s.y,
+          startX: e.clientX + window.scrollX,
+          startY: e.clientY + window.scrollY,
+          bounds: getBounds(),
+        };
+        card.setPointerCapture(e.pointerId);
+        card.classList.add("is-dragging");
+        card.style.zIndex = String(++zTop);
+        const loop = () => {
+          if (!drag) return;
+          if (!reduceMotion) s.r *= 0.92; // o tilt volta sozinho quando para
+          render();
+          raf = requestAnimationFrame(loop);
+        };
+        raf = requestAnimationFrame(loop);
+        e.preventDefault();
+        return;
+      }
+
+      const p = toCanvas(e);
+      stroke = { id: e.pointerId, started: false, sx: e.clientX, sy: e.clientY, last: p, mid: p };
+    });
+
+    card.addEventListener("pointermove", (e) => {
+      if (drag && e.pointerId === drag.id) {
+        const dx = e.clientX - drag.px;
+        drag.px = e.clientX;
+        if (!reduceMotion) s.r = clamp(s.r * 0.6 + dx * 0.5, -8, 8);
+        const px = e.clientX + window.scrollX;
+        const py = e.clientY + window.scrollY;
+        s.x = clamp(drag.sx + px - drag.startX, drag.bounds.minX, drag.bounds.maxX);
+        s.y = clamp(drag.sy + py - drag.startY, drag.bounds.minY, drag.bounds.maxY);
+        render();
+        return;
+      }
+
+      if (!stroke || e.pointerId !== stroke.id) return;
+      if (e.buttons === 0) {
+        stroke = null;
+        return;
+      }
+      if (!stroke.started) {
+        if (Math.hypot(e.clientX - stroke.sx, e.clientY - stroke.sy) < THRESHOLD) return;
+        stroke.started = true;
+        // Captura só depois de começar a riscar: o traço continua mesmo se o
+        // mouse sair do cartão, mas só aparece sobre ele.
+        card.setPointerCapture(e.pointerId);
+      }
+      const events = e.getCoalescedEvents ? e.getCoalescedEvents() : [];
+      (events.length ? events : [e]).forEach(drawTo);
+    });
+
+    const end = (e) => {
+      if (drag && e.pointerId === drag.id) {
+        drag = null;
+        cancelAnimationFrame(raf);
+        s.r = 0;
+        card.classList.remove("is-dragging");
+        render();
+      }
+      if (stroke && e.pointerId === stroke.id) stroke = null;
+      if (card.hasPointerCapture(e.pointerId)) card.releasePointerCapture(e.pointerId);
+    };
+    card.addEventListener("pointerup", end);
+    card.addEventListener("pointercancel", end);
+
+    // Duplo clique alterna entre riscar e mover
+    card.addEventListener("dblclick", () => setMove(!isMove()));
+
+    card.addEventListener("dragstart", (e) => e.preventDefault());
+
+    // Esc ou clique fora voltam para o modo riscar
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && isMove()) setMove(false);
+    });
+    document.addEventListener("pointerdown", (e) => {
+      if (isMove() && !card.contains(e.target)) setMove(false);
+    });
+
+    // Teclado: Enter liga/desliga o mover; setas movem
+    card.addEventListener("keydown", (e) => {
+      if (e.target !== card) return;
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        setMove(!isMove());
+        return;
+      }
+      if (!isMove()) return;
+      const step = e.shiftKey ? KEY_STEP * 3 : KEY_STEP;
+      const delta = {
+        ArrowLeft: [-step, 0],
+        ArrowRight: [step, 0],
+        ArrowUp: [0, -step],
+        ArrowDown: [0, step],
+      }[e.key];
+      if (!delta) return;
+      e.preventDefault();
+      const b = getBounds();
+      s.x = clamp(s.x + delta[0], b.minX, b.maxX);
+      s.y = clamp(s.y + delta[1], b.minY, b.maxY);
+      render();
+    });
+
+    // Ao redimensionar, mantém o cartão dentro da página
+    let resizeTimer = 0;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        const b = getBounds();
+        s.x = clamp(s.x, b.minX, b.maxX);
+        s.y = clamp(s.y, b.minY, b.maxY);
+        render();
+      }, 150);
+    });
+  }
+
   initNav();
   initDraggableCards();
   initContactForm();
   initFreeTransform();
   initTextScramble();
+  initIdCard();
 })();
