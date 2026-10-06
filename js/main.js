@@ -3,6 +3,8 @@
    1 Navbar que some gradualmente   2 Cards arrastáveis (home)   3 Formulário
    4 Foto do hero com transformação livre   5 Texto que embaralha (duplo clique)
    6 Identidade da página About (riscar e mover)
+   7 Navbar: marcador da página atual desliza entre os itens
+   8 Texto da home sendo digitado
    ========================================================================== */
 (() => {
   "use strict";
@@ -781,10 +783,207 @@
     });
   }
 
+  /* 7. NAVBAR: MARCADOR DA PÁGINA ATUAL DESLIZA ------------------------------ */
+  // Ao clicar em outro item, a página recarrega e o marcador colorido nasce no
+  // item de onde você veio e desliza até o novo, mudando de cor no caminho.
+  // Sem JS, o item atual continua colorido, só que sem a animação.
+  function initNavSlider() {
+    const nav = document.querySelector("[data-nav]");
+    if (!nav) return;
+    const links = Array.from(nav.querySelectorAll("a"));
+    if (!links.length) return;
+
+    const SLIDE_DELAY = 90; // ms de pausa antes de começar a deslizar
+    const MAX_AGE = 8000; // ms: passado esse tempo, a origem guardada é ignorada
+    const KEY = "navSlideFrom";
+
+    const here = links.find((a) => a.getAttribute("aria-current") === "page");
+    if (!here) return;
+
+    const current = document.createElement("span");
+    current.className = "nav__current";
+    current.setAttribute("aria-hidden", "true");
+    nav.insertBefore(current, nav.firstChild);
+    nav.classList.add("nav--sliding");
+
+    const place = (link) => {
+      current.style.width = link.offsetWidth + "px";
+      current.style.height = link.offsetHeight + "px";
+      current.style.transform = `translateX(${link.offsetLeft}px)`;
+    };
+    const colorOf = (link) => getComputedStyle(link).getPropertyValue("--current-bg").trim();
+    const jump = (link) => {
+      // Posiciona sem transição (pulo instantâneo)
+      current.style.transition = "none";
+      place(link);
+      current.style.backgroundColor = colorOf(link);
+      current.getBoundingClientRect(); // força o layout antes de religar a transição
+      current.style.transition = "";
+    };
+
+    // Guarda de onde o clique saiu. sessionStorage é o caminho principal;
+    // window.name é reserva para navegadores que isolam arquivos abertos do disco.
+    const stash = {
+      set(value) {
+        try { sessionStorage.setItem(KEY, value); } catch (_) {}
+        window.name = KEY + ":" + value;
+      },
+      take() {
+        let value = null;
+        try {
+          value = sessionStorage.getItem(KEY);
+          sessionStorage.removeItem(KEY);
+        } catch (_) {}
+        if (window.name.indexOf(KEY + ":") === 0) {
+          if (value === null) value = window.name.slice(KEY.length + 1);
+          window.name = "";
+        }
+        return value;
+      },
+    };
+
+    let from = null;
+    const raw = stash.take();
+    if (raw) {
+      const [idx, at] = raw.split("@").map(Number);
+      if (Date.now() - at < MAX_AGE && links[idx] && links[idx] !== here) from = links[idx];
+    }
+
+    jump(from || here);
+    if (from) {
+      here.classList.add("is-arriving"); // ícone começa preto
+      setTimeout(() => {
+        place(here);
+        current.style.backgroundColor = colorOf(here);
+        here.classList.remove("is-arriving"); // e clareia junto com o deslize (ver CSS)
+      }, SLIDE_DELAY);
+    }
+
+    // Ao clicar em outra página, guarda o item atual para a próxima carga animar
+    links.forEach((link) => {
+      link.addEventListener("click", (e) => {
+        if (link === here) return;
+        const href = link.getAttribute("href") || "";
+        if (href.charAt(0) === "#") return; // âncora da mesma página: sem recarregar
+        if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        stash.set(links.indexOf(here) + "@" + Date.now());
+      });
+    });
+
+    window.addEventListener("resize", () => jump(here));
+  }
+
+  /* 8. TEXTO SENDO DIGITADO (HOME) ------------------------------------------ */
+  // Todo elemento com [data-type] é digitado na ordem em que aparece na página.
+  // Opcional: data-type-speed="ms por letra" (padrão 25).
+  // O texto original fica numa cópia invisível para leitores de tela; a versão
+  // animada é aria-hidden. Com "reduzir movimento", o texto aparece pronto.
+  function initTypewriter() {
+    const targets = Array.from(document.querySelectorAll("[data-type]"));
+    if (!targets.length) return;
+    if (reduceMotion) {
+      targets.forEach((el) => el.classList.add("tw-ready"));
+      return;
+    }
+
+    const START_DELAY = 250; // ms antes da primeira letra
+    const GAP = 200; // ms de pausa entre um elemento e o próximo
+    const DEFAULT_MS = 25; // ms por letra quando não há data-type-speed
+    const PAUSE_SOFT = 70; // ms extra depois de , ; :
+    const PAUSE_HARD = 130; // ms extra depois de . ! ?
+    const JITTER = 0.4; // 0.4 = cada letra varia ±40% no ritmo, para soar humano
+    const CARET_LINGER = 1800; // ms que o cursor continua piscando no fim
+
+    const caret = document.createElement("span");
+    caret.className = "tw-caret is-typing";
+    caret.setAttribute("aria-hidden", "true");
+
+    const timeline = []; // { el: <span da letra>, at: ms desde o início }
+    let t = START_DELAY;
+
+    targets.forEach((el) => {
+      const base = Number(el.dataset.typeSpeed) || DEFAULT_MS;
+      const label = el.textContent.replace(/\s+/g, " ").trim();
+
+      // Move todo o conteúdo para um contêiner visual, dividindo o texto em
+      // palavras e letras (elementos como <br> são preservados)
+      const visual = document.createElement("span");
+      visual.className = "tw";
+      visual.setAttribute("aria-hidden", "true");
+      const chars = [];
+
+      Array.from(el.childNodes).forEach((node) => {
+        if (node.nodeType !== Node.TEXT_NODE) {
+          visual.appendChild(node);
+          return;
+        }
+        const frag = document.createDocumentFragment();
+        node.nodeValue.split(/(\s+)/).forEach((token) => {
+          if (!token) return;
+          if (/^\s+$/.test(token)) {
+            frag.appendChild(document.createTextNode(token));
+            return;
+          }
+          const word = document.createElement("span");
+          word.className = "tw-word";
+          Array.from(token).forEach((ch) => {
+            const c = document.createElement("span");
+            c.className = "tw-char";
+            c.textContent = ch;
+            word.appendChild(c);
+            chars.push(c);
+          });
+          frag.appendChild(word);
+        });
+        visual.appendChild(frag);
+      });
+
+      const sr = document.createElement("span");
+      sr.className = "sr-only";
+      sr.textContent = label;
+      el.textContent = "";
+      el.append(sr, visual);
+
+      chars.forEach((c) => {
+        timeline.push({ el: c, at: t });
+        const ch = c.textContent;
+        let step = base * (1 - JITTER + Math.random() * 2 * JITTER);
+        if (/[,;:]/.test(ch)) step += PAUSE_SOFT;
+        else if (/[.!?]/.test(ch)) step += PAUSE_HARD;
+        t += step;
+      });
+      t += GAP;
+    });
+
+    if (!timeline.length) return;
+    targets.forEach((el) => el.classList.add("tw-ready"));
+    timeline[0].el.before(caret);
+
+    let i = 0;
+    const t0 = performance.now();
+    const frame = (now) => {
+      const elapsed = now - t0;
+      while (i < timeline.length && timeline[i].at <= elapsed) {
+        timeline[i].el.classList.add("is-on");
+        timeline[i].el.after(caret); // o cursor anda junto com a última letra
+        i++;
+      }
+      if (i < timeline.length) return requestAnimationFrame(frame);
+      caret.classList.remove("is-typing"); // terminou: cursor passa a piscar
+      setTimeout(() => {
+        caret.classList.add("is-done");
+        setTimeout(() => caret.remove(), 500);
+      }, CARET_LINGER);
+    };
+    requestAnimationFrame(frame);
+  }
+
+  initTypewriter();
   initNav();
   initDraggableCards();
   initContactForm();
   initFreeTransform();
   initTextScramble();
   initIdCard();
+  initNavSlider();
 })();

@@ -58,10 +58,12 @@
 }
 
 /* Cada página ganha uma cor de destaque da paleta */
+/* Mesmas cores do item ativo da navbar: Home azul, About verde, Projects amarelo.
+   A página de projeto individual mantém "Projects" ativo na navbar, então fica amarela. */
 body[data-page="home"] { --accent: var(--blue); }
-body[data-page="about"] { --accent: var(--yellow); }
-body[data-page="projects"] { --accent: var(--green); }
-body[data-page="project"] { --accent: var(--red); }
+body[data-page="about"] { --accent: var(--green); }
+body[data-page="projects"] { --accent: var(--yellow); }
+body[data-page="project"] { --accent: var(--yellow); }
 
 /* 2. BASE ----------------------------------------------------------------- */
 *,
@@ -142,7 +144,6 @@ button, input, textarea { font: inherit; color: inherit; }
 
 .display-about {
   color: #000000;
-  padding-top: 20%;
   font-size: 100px;
   font-weight: 300;
   line-height: 0.95;
@@ -159,14 +160,14 @@ button, input, textarea { font: inherit; color: inherit; }
 }
 
 .lead {
-  max-width: 46ch;
+  max-width: auto;
   font-size: var(--fs-lead);
   line-height: 1.6;
   color: #efefef;
 }
 
 .lead-about {
-  max-width: 46ch;
+  max-width: auto;
   font-size: var(--fs-lead);
   line-height: 1.6;
   color: #000000;
@@ -249,6 +250,33 @@ button, input, textarea { font: inherit; color: inherit; }
   will-change: opacity, transform;
 }
 
+/* Hover simples: só troca o fundo, sem animação de deslize */
+.nav a:not([aria-current]):hover { background: #0000002d; }
+
+/* Marcador da página atual: desliza do item anterior para o novo (criado pelo JS). */
+.nav__current {
+  position: absolute;
+  top: 6px;
+  left: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  background: transparent;
+  pointer-events: none;
+  transition:
+    transform 0.5s var(--ease),
+    width 0.5s var(--ease),
+    background-color 0.5s var(--ease);
+}
+/* Com o JS ativo, o fundo colorido sai do link e vai para o marcador */
+.nav--sliding a[aria-current="page"] { background: transparent; }
+/* Durante a viagem o ícone fica preto, senão ele some (branco sobre a barra branca).
+   Ao sair do estado "is-arriving" ele clareia no mesmo ritmo do marcador. */
+.nav--sliding a[aria-current="page"] {
+  transition: color 0.55s var(--ease) 0.08s, background-color 0.2s var(--ease);
+}
+.nav--sliding a[aria-current="page"].is-arriving { color: var(--black); }
+
 /* Se alguém navegar por teclado, a barra reaparece mesmo depois de sumir */
 .nav:focus-within {
   opacity: 1 !important;
@@ -257,6 +285,7 @@ button, input, textarea { font: inherit; color: inherit; }
 }
 
 .nav__link1 {
+  --current-bg: #00b4e1;
   display: grid;
   place-items: center;
   width: 44px;
@@ -265,11 +294,11 @@ button, input, textarea { font: inherit; color: inherit; }
   color: #000000;
   transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
 }
-.nav__link1:hover { background: #0000002d; }
-.nav__link1[aria-current="page"] { background: #00b4e1; color: var(--white); }
+.nav__link1[aria-current="page"] { background: var(--current-bg); color: var(--white); }
 .nav__link1 svg { width: 20px; height: 20px; }
 
 .nav__link2 {
+  --current-bg: #02b801;
   display: grid;
   place-items: center;
   width: 44px;
@@ -278,11 +307,11 @@ button, input, textarea { font: inherit; color: inherit; }
   color: var(--black);
   transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
 }
-.nav__link2:hover { background: #0000002d; }
-.nav__link2[aria-current="page"] { background: #02b801; color: var(--white); }
+.nav__link2[aria-current="page"] { background: var(--current-bg); color: var(--white); }
 .nav__link2 svg { width: 20px; height: 20px; }
 
 .nav__link3 {
+  --current-bg: #fcaf0b;
   display: grid;
   place-items: center;
   width: 44px;
@@ -291,11 +320,11 @@ button, input, textarea { font: inherit; color: inherit; }
   color: var(--black);
   transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
 }
-.nav__link3:hover { background: #0000002d; }
-.nav__link3[aria-current="page"] { background: #fcaf0b; color: var(--white); }
+.nav__link3[aria-current="page"] { background: var(--current-bg); color: var(--white); }
 .nav__link3 svg { width: 20px; height: 20px; }
 
 .nav__link4 {
+  --current-bg: #fe3c3c;
   display: grid;
   place-items: center;
   width: 44px;
@@ -304,23 +333,25 @@ button, input, textarea { font: inherit; color: inherit; }
   color: var(--black);
   transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
 }
-.nav__link4:hover { background: #0000002d; }
-.nav__link4[aria-current="page"] { background: #fe3c3c; color: var(--white); }
+.nav__link4[aria-current="page"] { background: var(--current-bg); color: var(--white); }
 .nav__link4 svg { width: 20px; height: 20px; }
 
 /* 5. HERO ----------------------------------------------------------------- */
 
 .hero-photo-about {
-  display: block;
-  margin-top: 200px;
-  margin-left: auto;
-  margin-right: auto;
-  width: 50%;
+  display: flex;
+  flex-direction: column;   /* cartão em cima, legenda embaixo */
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  width: min(100%, 760px);
 }
 
 /* Identidade: riscar (arrastar) e mover (duplo clique) */
 .id-card {
   position: relative;
+  width: min(100%, 760px);
+  margin-inline: auto;
   user-select: none;
   -webkit-user-select: none;
   cursor: crosshair;
@@ -332,8 +363,9 @@ button, input, textarea { font: inherit; color: inherit; }
 .id-card__canvas {
   position: absolute;
   inset: 0;
-  width: 80%;
-  height: 80%;
+  width: 100%;
+  height: 100%;
+  transform: rotate(2deg);
 }
 .id-card:focus-visible { outline: 2px solid var(--black); outline-offset: 6px; border-radius: var(--radius-md); }
 
@@ -372,6 +404,35 @@ button, input, textarea { font: inherit; color: inherit; }
   gap: 48px;
   width: min(100%, var(--container));
   margin-inline: auto;
+}
+
+.about-copy {
+  background: #efefef;
+  padding-block: clamp(56px, 8vw, 112px);
+}
+
+.about-copy .hero__inner {
+  width: min(100%, var(--container));
+  margin-inline: auto;
+  padding-inline: var(--pad);
+  min-height: 0;
+  display: block;
+}
+
+.about-copy .hero__text {
+  display: grid;
+  gap: 24px;
+  width: min(100%, var(--container));
+  max-width: none;
+  margin-inline: auto;
+}
+
+.hero-about {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100svh;
+  background: #02b801;
 }
 
 .hero__text { display: grid; gap: 24px; }
@@ -463,6 +524,50 @@ body[data-page="home"] .hero__visual {
 .hero-photo__handle[data-dir="sw"] { left: 0;    top: 100%; cursor: nesw-resize; }
 .hero-photo__handle[data-dir="w"]  { left: 0;    top: 50%;  cursor: ew-resize; }
 
+.hello-sticker {
+  max-width: 40%;
+  max-height: auto;
+  transform: rotate(-5deg) translateY(-164px) translatex(15px);
+  margin-bottom: -145px;
+}
+
+.exp-intro {
+  display: flex;
+  align-items: center;
+  align-self: center;
+  gap: 16px;
+}
+
+.exp-icon {
+  width: 48px;
+  height: 48px;
+}
+
+.lic-intro {
+  padding-top: 40px;
+  display: flex;
+  align-items: center;
+  align-self: center;
+  gap: 16px;
+}
+
+.lic-icon {
+  width: 48px;
+  height: 48px;
+}
+
+.tech-intro {
+  display: flex;
+  align-items: center;
+  align-self: center;
+  gap: 16px;
+}
+
+.tech-icon {
+  width: 48px;
+  height: 48px;
+}
+
 
 /* Único momento de movimento "espontâneo": entrada do hero */
 @keyframes pop {
@@ -474,7 +579,60 @@ body[data-page="home"] .hero__visual {
 .hero__visual .hero-photo { animation: pop 0.7s var(--ease) both; }
 .hero__visual .hero-photo { animation-delay: 0.18s; }
 
+/* Entrada da página: mesma animação "pop" da foto da home.
+   "backwards" aplica só o estado inicial e solta o elemento no fim, assim o
+   transform do arrastar (JS) e o z-index do cartão não ficam presos. */
+.hero-photo-about { animation: pop 0.7s var(--ease) 0.18s backwards; }
+
+body[data-page="projects"] .highlight { animation: pop 0.6s var(--ease) 0.05s backwards; }
+body[data-page="projects"] .card { animation: pop 0.6s var(--ease) calc(0.15s + var(--i, 0) * 0.07s) backwards; }
+body[data-page="projects"] .card:nth-child(1) { --i: 0; }
+body[data-page="projects"] .card:nth-child(2) { --i: 1; }
+body[data-page="projects"] .card:nth-child(3) { --i: 2; }
+body[data-page="projects"] .card:nth-child(4) { --i: 3; }
+body[data-page="projects"] .card:nth-child(5) { --i: 4; }
+body[data-page="projects"] .card:nth-child(6) { --i: 5; }
+body[data-page="projects"] .card:nth-child(7) { --i: 6; }
+body[data-page="projects"] .card:nth-child(8) { --i: 7; }
+
 .caption { font-size: var(--fs-small); color: var(--ink-soft); margin-top: 12px; }
+
+/* Texto que "se digita" (home). O JS divide o texto em letras e revela uma a uma;
+   o layout não muda porque todas as letras já ocupam espaço (só ficam transparentes). */
+@media (scripting: enabled) {
+  /* Esconde o texto puro até o JS assumir. Se o JS falhar, aparece após 2s. */
+  [data-type]:not(.tw-ready) { visibility: hidden; animation: tw-failsafe 0s 2s forwards; }
+}
+@keyframes tw-failsafe { to { visibility: visible; } }
+@media (prefers-reduced-motion: reduce) {
+  [data-type] { visibility: visible !important; animation: none !important; }
+}
+
+.tw-word { display: inline-block; white-space: nowrap; }   /* palavra nunca quebra no meio */
+.tw-char { opacity: 0; }
+.tw-char.is-on { opacity: 1; }
+
+/* Cursor: largura zero, então não empurra o texto nem altera a altura da linha */
+.tw-caret {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+.tw-caret::after {
+  content: "";
+  position: absolute;
+  left: 0.03em;
+  bottom: -0.12em;
+  width: max(2px, 0.06em);
+  height: 0.9em;
+  background: currentColor;
+  animation: tw-blink 1s steps(1) infinite;
+  transition: opacity 0.4s ease;
+}
+.tw-caret.is-typing::after { animation: none; }   /* fixo enquanto digita, pisca quando termina */
+.tw-caret.is-done::after { opacity: 0; }
+@keyframes tw-blink { 50% { opacity: 0; } }
 
 /* 6. PLACEHOLDERS (no lugar das fotos) ------------------------------------ */
 .ph {
@@ -491,7 +649,7 @@ body[data-page="home"] .hero__visual {
 .ph[data-label]::after { content: attr(data-label); }
 .ph svg { width: 56px; height: 56px; }
 
-.ph--blue { --ph-bg: var(--blue); }
+.ph--blue { --ph-bg: var(--blue);}
 .ph--yellow { --ph-bg: var(--yellow); }
 .ph--green { --ph-bg: var(--green); }
 .ph--red { --ph-bg: var(--red); }
@@ -514,13 +672,40 @@ body[data-page="home"] .hero__visual {
   overflow: hidden;
 }
 
-.card__media { aspect-ratio: 16 / 10; }
+.card__media {
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Quando houver imagem, ela ocupa TODO o box */
+.card__media:has(img) {
+  display: block;
+  background: transparent;
+  padding: 0;
+}
+
+.card__media:has(img) img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  display: block;
+  object-fit: cover;
+}
+
+/* Remove o "Image" */
+.card__media:has(img)::after {
+  display: none;
+  content: none;
+}
 
 .card__body {
   display: grid;
   gap: 8px;
   padding: 18px 18px 20px;
-  align-content: start;
+  align-content:start;
   flex: 1;
 }
 
@@ -609,6 +794,117 @@ body[data-page="home"] .hero__visual {
 
 .about-grid { display: grid; gap: 32px; }
 
+/* 9b. SOBRE: EXPERIÊNCIA E CERTIFICAÇÕES --------------------------------- */
+.resume {
+  background: var(--paper);
+  padding-block: 0 clamp(56px, 8vw, 112px); /* o respiro de cima vem do .about-copy */
+}
+
+.resume__inner {
+  display: grid;
+  gap: clamp(20px, 3vw, 32px);
+  width: min(100%, var(--container));
+  margin-inline: auto;
+  padding-inline: var(--pad);
+}
+
+/* Entre os dois blocos, um respiro maior que o espaço entre cartões */
+.resume__inner > .h2:not(:first-child) { margin-top: clamp(32px, 6vw, 80px); }
+
+.resume__list { display: grid; gap: var(--gutter); }
+
+.resume__item {
+  margin-right: 30px;
+  margin-left: 30px;
+  position: relative;
+  display: grid;
+  gap: 6px;
+  padding: 18px 34px 20px 62px; /* espaço para a bolinha e recuo do conteúdo */
+  background: rgb(0 0 0 / 0.08);
+  border-radius: var(--radius-md);
+}
+
+/* Bolinha do wireframe, na cor de destaque da página */
+.resume__item::before {
+  content: "";
+  position: absolute;
+  top: 21px;
+  left: 24px;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+}
+
+.resume__title {
+  font-size: 1.0625rem;
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.resume__meta {
+  font-size: var(--fs-small);
+  font-weight: 500;
+  line-height: 1.4;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.resume__text {
+  margin-top: 6px;
+  font-size: var(--fs-small);
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.resume__bullets { display: grid; gap: 4px; }
+
+.resume__bullets li {
+  position: relative;
+  padding-left: 16px;
+  font-size: var(--fs-small);
+  line-height: 1.45;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.resume__bullets li::before { content: "\00B7"; position: absolute; left: 2px; }
+
+/* Software e tecnologias: cada ferramenta é um bloco com ícone e nome */
+.tech-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.tech-item {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 10px;
+  padding: 18px 8px 14px;
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+
+.tech-item img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.tech-item span {
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
 /* 10. CONTATO (footer) ---------------------------------------------------- */
 .contact {
   padding: clamp(48px, 7vw, 96px) var(--pad);
@@ -689,6 +985,7 @@ a.info__value:hover { text-decoration-thickness: 2px; }
   text-decoration: none;
   transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
 }
+.social a svg { width: 20px; height: 20px; display: block; }
 .social a:hover { background: var(--accent); color: var(--black); }
 
 .form { display: grid; gap: 16px; padding: 24px; background: var(--panel); border-radius: var(--radius-md); }
@@ -749,6 +1046,8 @@ a.info__value:hover { text-decoration-thickness: 2px; }
   .case__gallery { grid-template-columns: 1fr; }
   .contact__title { flex-direction: column; }
   .projects-head { align-items: flex-start; flex-direction: column-reverse; }
+  .resume__item { padding: 16px 26px 18px 54px; }
+  .resume__item::before { top: 19px; left: 16px; }
 }
 
 /* 12. MOVIMENTO REDUZIDO -------------------------------------------------- */
