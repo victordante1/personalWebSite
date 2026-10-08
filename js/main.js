@@ -68,14 +68,108 @@
     const EDGE = 80; // zona da borda da tela que rola a página sozinha
     const MAX_SCROLL = 18;
     const KEY_STEP = 16;
+    // Raio do "ímã" em volta de cada slot VAZIO (em larguras de card): o próprio slot do card
+    // ou um slot cujo card está solto por aí. Dentro dele o card é puxado para o tracejado e,
+    // se soltar ali, encaixa. Slots ocupados não atraem nem aceitam: o card só fica por cima.
+    const MAGNET_RATIO = 0.5;
+    const SLOT_TEXT = "cool project here";
 
-    const states = new Map(cards.map((card) => [card, { x: 0, y: 0, r: 0 }]));
+    // Cada card ganha um "slot" no grid: um contorno tracejado, no formato do card,
+    // que fica no lugar de origem e só aparece quando o card está fora dele.
+    cards.forEach((card) => {
+      const slot = document.createElement("div");
+      slot.className = "card-slot";
+      const ghost = document.createElement("div");
+      ghost.className = "card-slot__ghost";
+      ghost.setAttribute("aria-hidden", "true");
+      ghost.textContent = SLOT_TEXT;
+      card.parentNode.insertBefore(slot, card);
+      slot.append(ghost, card);
+    });
+    const homeSlot = new Map(cards.map((card) => [card, card.parentElement]));
+
+    // A animação de entrada reiniciaria ao trocar o card de slot: depois que ela
+    // termina, ela é desligada (classe is-settled)
+    cards.forEach((card) =>
+      card.addEventListener("animationend", (e) => e.target === card && card.classList.add("is-settled"))
+    );
+
+    const states = new Map(
+      cards.map((card) => [card, { x: 0, y: 0, r: 0, tilt: 0, fold: 0, cx: -1, cy: -1, R: 0 }])
+    );
+    const CORNERS = ["peel-tl", "peel-tr", "peel-bl", "peel-br"];
     let zTop = 20;
+
+    // Em telas de 1100px ou menos o arrasto fica desligado: os cards voltam ao
+    // lugar, deixam de ser focáveis como "arrastáveis" e as setas não movem nada.
+    const noDrag = window.matchMedia("(max-width: 1100px)");
+    const original = new Map(
+      cards.map((card) => [
+        card,
+        { tabindex: card.getAttribute("tabindex"), described: card.getAttribute("aria-describedby") },
+      ])
+    );
+
+    // Geometria da dobra. Coordenadas locais (u, v) saem do canto agarrado e correm
+    // pelas duas bordas. A aba é o espelho, na linha da dobra, do pedaço do card que
+    // foi levantado, inclusive o arredondado do canto original (por isso a ponta da
+    // aba é redonda e não pontuda).
+    const peelShapes = (sx, sy, c, W, H, R) => {
+      const M = Math.max(c, R) + 1;
+      const base = [[M, 0], [R, 0]];
+      for (let i = 1; i <= 10; i++) {
+        const a = (i / 10) * (Math.PI / 2);
+        base.push([R - R * Math.sin(a), R - R * Math.cos(a)]);
+      }
+      base.push([0, M], [M, M]);
+      const cut = [];
+      for (let i = 0; i < base.length; i++) {
+        const a = base[i];
+        const b = base[(i + 1) % base.length];
+        const fa = a[0] + a[1] - c;
+        const fb = b[0] + b[1] - c;
+        if (fa <= 0) cut.push(a);
+        if ((fa < 0 && fb > 0) || (fa > 0 && fb < 0)) {
+          const t = fa / (fa - fb);
+          cut.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]);
+        }
+      }
+      const f = (n) => `${n.toFixed(1)}px`;
+      const flap = cut.map(([u, v]) => {
+        const fu = c - v;
+        const fv = c - u;
+        return `${f(sx < 0 ? fu : c - fu)} ${f(sy < 0 ? fv : c - fv)}`;
+      });
+      const body = [[c, 0], [W, 0], [W, H], [0, H], [0, c]].map(
+        ([u, v]) => `${f(sx < 0 ? u : W - u)} ${f(sy < 0 ? v : H - v)}`
+      );
+      return { card: `polygon(${body.join(", ")})`, flap: `polygon(${flap.join(", ")})` };
+    };
 
     const render = (card) => {
       const s = states.get(card);
+      // Eixo na diagonal do canto agarrado: ele sobe em direção a quem olha, o oposto fica colado
+      const lift = s.tilt
+        ? ` perspective(900px) rotate3d(${-s.cy}, ${s.cx}, 0, ${-s.tilt}deg)`
+        : "";
       card.style.transform =
-        s.x || s.y || s.r ? `translate3d(${s.x}px, ${s.y}px, 0) rotate(${s.r}deg)` : "";
+        s.x || s.y || s.r || s.tilt
+          ? `translate3d(${s.x}px, ${s.y}px, 0) rotate(${s.r}deg)${lift}`
+          : "";
+      card.style.setProperty("--fold", `${s.fold}px`);
+      const peeling = s.fold > 1;
+      card.classList.toggle("is-peeling", peeling);
+      if (peeling) {
+        if (!s.R) s.R = parseFloat(getComputedStyle(card).borderTopLeftRadius) || 14;
+        const shape = peelShapes(s.cx, s.cy, s.fold, card.offsetWidth, card.offsetHeight, s.R);
+        card.style.clipPath = shape.card;
+        card.style.setProperty("--flap", shape.flap);
+      } else {
+        card.style.clipPath = "";
+      }
+      const slot = card.parentElement;
+      if (s.x || s.y) slot.classList.add("is-away");
+      else slot.classList.remove("is-away");
     };
 
     // Limites em coordenadas de documento, para o card nunca sair da página
@@ -98,17 +192,131 @@
       };
     };
 
+    const settling = new Map();
+    const clearMarks = () =>
+      document
+        .querySelectorAll(".card-slot.is-armed, .card-slot.is-target")
+        .forEach((el) => el.classList.remove("is-armed", "is-target"));
+
+    const cancelSettle = (card) => {
+      const id = settling.get(card);
+      if (id === undefined) return;
+      cancelAnimationFrame(id);
+      settling.delete(card);
+      card.classList.remove("no-anim");
+    };
+
+    // Assenta o card como um sticker pousando no álbum: posição, giro, inclinação e dobra
+    // vão a zero (ou só os três últimos, se for ficar onde está) com desaceleração suave
+    // e SEM passar do ponto, então ele encosta no slot sem balançar.
+    const settle = (card, toHome) => {
+      cancelSettle(card);
+      const s = states.get(card);
+      const from = { x: s.x, y: s.y, r: s.r, tilt: s.tilt, fold: s.fold };
+      const dur = reduceMotion ? 0 : Math.min(360, 200 + (toHome ? Math.hypot(s.x, s.y) * 0.6 : 0));
+      card.classList.remove("is-dragging");
+      card.classList.add("no-anim");
+      const t0 = performance.now();
+      const step = (now) => {
+        const t = dur ? Math.min((now - t0) / dur, 1) : 1;
+        const keep = Math.pow(1 - t, 3); // ease-out cúbico: monotônico, sem overshoot
+        if (toHome) {
+          s.x = from.x * keep;
+          s.y = from.y * keep;
+        }
+        s.r = from.r * keep;
+        s.tilt = from.tilt * keep;
+        s.fold = from.fold * keep;
+        render(card);
+        if (t < 1) {
+          settling.set(card, requestAnimationFrame(step));
+        } else {
+          settling.delete(card);
+          card.classList.remove("no-anim");
+          if (toHome) card.style.zIndex = "";
+        }
+      };
+      settling.set(card, requestAnimationFrame(step));
+    };
+
+    // Encaixa o card A em outro slot vazio (cujo card está solto por aí). O card solto fica
+    // exatamente onde está; só passa a ter como origem o slot que A deixou.
+    const dockInto = (A, targetSlot) => {
+      const slotA = A.parentElement;
+      const B = targetSlot.querySelector(".card");
+      if (!B || targetSlot === slotA) return settle(A, true);
+      const sA = states.get(A);
+      const sB = states.get(B);
+      const ra = slotA.getBoundingClientRect();
+      const rb = targetSlot.getBoundingClientRect();
+      const dx = ra.left - rb.left;
+      const dy = ra.top - rb.top;
+
+      targetSlot.append(A);
+      slotA.append(B);
+      A.classList.add("no-anim");
+      B.classList.add("no-anim");
+      sA.x += dx;
+      sA.y += dy;
+      sB.x -= dx;
+      sB.y -= dy;
+      render(A);
+      render(B);
+      void A.offsetWidth; // aplica as posições sem transição
+      B.classList.remove("no-anim");
+      A.style.zIndex = String(++zTop);
+      settle(A, true);
+    };
+
     cards.forEach((card) => {
       const s = states.get(card);
       let drag = null;
       let raf = 0;
+      const slotOf = () => card.parentElement;
+      const springBack = () => {
+        clearMarks();
+        settle(card, true);
+      };
+      // Tracejado escuro no slot que vai receber o card se soltar agora
+      const markTarget = (el) => {
+        if (drag.marked === el) return;
+        if (drag.marked) drag.marked.classList.remove("is-armed", "is-target");
+        drag.marked = el;
+        if (el) el.classList.add(el === slotOf() ? "is-armed" : "is-target");
+      };
       let suppressClick = false;
 
       const place = () => {
         const px = drag.cx + window.scrollX;
         const py = drag.cy + window.scrollY;
-        s.x = clamp(drag.sx + px - drag.startX, drag.bounds.minX, drag.bounds.maxX);
-        s.y = clamp(drag.sy + py - drag.startY, drag.bounds.minY, drag.bounds.maxY);
+        const rx = clamp(drag.sx + px - drag.startX, drag.bounds.minX, drag.bounds.maxX);
+        const ry = clamp(drag.sy + py - drag.startY, drag.bounds.minY, drag.bounds.maxY);
+        // Centro onde o card estaria seguindo o ponteiro, sem ímã (coords de documento)
+        const rcx = drag.own.cx + rx;
+        const rcy = drag.own.cy + ry;
+        // Slot mais próximo: o de origem ou qualquer outro
+        let best = null;
+        let bd = Infinity;
+        for (const sl of drag.slots) {
+          const d = Math.hypot(rcx - sl.cx, rcy - sl.cy);
+          if (d < bd) {
+            bd = d;
+            best = sl;
+          }
+        }
+        const radius = card.offsetWidth * MAGNET_RATIO;
+        const near = bd < radius;
+        // Ímã: dentro do raio o card aparece mais perto do slot do que o ponteiro
+        const pull = near ? Math.pow(bd / radius, 1.8) : 1;
+        const tcx = near ? best.cx + (rcx - best.cx) * pull : rcx;
+        const tcy = near ? best.cy + (rcy - best.cy) * pull : rcy;
+        s.x = tcx - drag.own.cx;
+        s.y = tcy - drag.own.cy;
+        drag.target = near ? best.el : null;
+        // Descolando / assentando: a dobra cresce até a metade do raio e some no centro e fora do ímã
+        const peel = reduceMotion || bd < 1 ? 0 : Math.sin(Math.PI * Math.min(bd / radius, 1));
+        s.tilt = peel * 12;
+        s.fold = peel * card.offsetWidth * 0.34;
       };
 
       const loop = () => {
@@ -119,14 +327,17 @@
         else if (drag.cy > vh - EDGE) dy = MAX_SCROLL * (1 - (vh - drag.cy) / EDGE);
         if (dy) window.scrollBy(0, dy);
         place();
+        markTarget(drag.target);
         if (!reduceMotion) s.r *= 0.92;
         render(card);
         raf = requestAnimationFrame(loop);
       };
 
       card.addEventListener("pointerdown", (e) => {
+        if (noDrag.matches) return;
         if (e.pointerType === "mouse" && e.button !== 0) return;
         if (e.pointerType !== "mouse" && !e.target.closest(".card__media")) return;
+        cancelSettle(card);
         drag = {
           id: e.pointerId,
           active: false,
@@ -139,6 +350,24 @@
           sy: s.y,
           bounds: getBounds(card),
         };
+        // Centros de todos os slots (coords de documento) para o ímã
+        // Só atraem o slot do próprio card e slots vazios (cujo card está solto e parado)
+        const candidates = Array.from(document.querySelectorAll(".card-slot")).filter(
+          (el) =>
+            el === slotOf() ||
+            (el.classList.contains("is-away") && !settling.has(el.querySelector(".card")))
+        );
+        drag.slots = candidates.map((el) => {
+          const r = el.getBoundingClientRect();
+          return { el, cx: r.left + r.width / 2 + window.scrollX, cy: r.top + r.height / 2 + window.scrollY };
+        });
+        drag.own = drag.slots.find((sl) => sl.el === slotOf());
+        drag.target = null;
+        const rect = card.getBoundingClientRect();
+        s.cx = e.clientX - rect.left < rect.width / 2 ? -1 : 1;
+        s.cy = e.clientY - rect.top < rect.height / 2 ? -1 : 1;
+        card.classList.remove(...CORNERS);
+        card.classList.add(CORNERS[(s.cy < 0 ? 0 : 2) + (s.cx < 0 ? 0 : 1)]);
       });
 
       card.addEventListener("pointermove", (e) => {
@@ -169,6 +398,7 @@
         drag.prevX = e.clientX;
         if (!reduceMotion) s.r = clamp(s.r * 0.6 + dx * 0.5, -8, 8);
         place();
+        markTarget(drag.target);
         render(card);
       });
 
@@ -179,16 +409,18 @@
       const end = (e) => {
         if (!drag || e.pointerId !== drag.id) return;
         const wasDragging = drag.active;
+        const target = drag.target;
         drag = null;
         cancelAnimationFrame(raf);
         if (!wasDragging) return;
 
         suppressClick = true;
         setTimeout(() => (suppressClick = false), 60);
-        card.classList.remove("is-dragging");
-        s.r = 0;
-        render(card);
         if (card.hasPointerCapture(e.pointerId)) card.releasePointerCapture(e.pointerId);
+        clearMarks();
+        if (target === slotOf()) settle(card, true); // ímã do próprio slot: volta e assenta
+        else if (target) dockInto(card, target); // slot vazio de outro card: encaixa
+        else settle(card, false); // fora de qualquer ímã (ou sobre card ocupado): fica por cima, assentado
       };
       card.addEventListener("pointerup", end);
       card.addEventListener("pointercancel", end);
@@ -207,7 +439,11 @@
       card.addEventListener("dragstart", (e) => e.preventDefault());
 
       card.addEventListener("keydown", (e) => {
-        if (e.target !== card) return;
+        if (noDrag.matches || e.target !== card) return;
+        if (e.key === "Escape") {
+          if (s.x || s.y) springBack();
+          return;
+        }
         const step = e.shiftKey ? KEY_STEP * 3 : KEY_STEP;
         const delta = {
           ArrowLeft: [-step, 0],
@@ -225,11 +461,34 @@
       });
     });
 
+    const syncDragMode = () => {
+      cards.forEach((card) => {
+        const o = original.get(card);
+        if (noDrag.matches) {
+          const s = states.get(card);
+          cancelSettle(card);
+          homeSlot.get(card).append(card);
+          s.x = s.y = s.r = s.tilt = s.fold = 0;
+          card.style.zIndex = "";
+          card.classList.remove("is-dragging");
+          render(card);
+          card.removeAttribute("tabindex");
+          card.removeAttribute("aria-describedby");
+        } else {
+          if (o.tabindex !== null) card.setAttribute("tabindex", o.tabindex);
+          if (o.described !== null) card.setAttribute("aria-describedby", o.described);
+        }
+      });
+    };
+    noDrag.addEventListener("change", syncDragMode);
+    syncDragMode();
+
     // Ao redimensionar, mantém os cards dentro da página
     let resizeTimer = 0;
     window.addEventListener("resize", () => {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
+        if (noDrag.matches) return;
         cards.forEach((card) => {
           const s = states.get(card);
           const b = getBounds(card);
@@ -635,10 +894,40 @@
     let drag = null;
     let raf = 0;
 
+    // O canvas (e qualquer ancestral) pode estar girado ou escalado por CSS. Nesse caso
+    // getBoundingClientRect() devolve a caixa do retângulo girado, que é maior que o canvas
+    // e não serve para achar o pixel sob o ponteiro (o traço saía deslocado da ponta do lápis).
+    // Então: parte do centro (o giro não o move), desfaz o giro e a escala acumulados e só
+    // depois converte para pixels do canvas.
+    const accumulatedTransform = (el) => {
+      let angle = 0;
+      let scale = 1;
+      for (let n = el; n && n.nodeType === 1; n = n.parentElement) {
+        const t = getComputedStyle(n).transform;
+        if (!t || t === "none") continue;
+        const m = new DOMMatrix(t);
+        angle += Math.atan2(m.b, m.a);
+        scale *= Math.hypot(m.a, m.b);
+      }
+      return { angle, scale };
+    };
+
     const toCanvas = (e) => {
       const rect = canvas.getBoundingClientRect();
-      const k = canvas.width / rect.width;
-      return { x: (e.clientX - rect.left) * k, y: (e.clientY - rect.top) * k, k };
+      const { angle, scale } = accumulatedTransform(canvas);
+      const dx = e.clientX - (rect.left + rect.width / 2);
+      const dy = e.clientY - (rect.top + rect.height / 2);
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      // vetor do centro ao ponteiro, girado de volta e sem a escala
+      const lx = (dx * cos + dy * sin) / scale;
+      const ly = (-dx * sin + dy * cos) / scale;
+      const w = canvas.offsetWidth;
+      const h = canvas.offsetHeight;
+      const kx = canvas.width / w;
+      const ky = canvas.height / h;
+      // k: pixels do canvas por pixel de tela (a espessura do traço é em px de tela)
+      return { x: (lx + w / 2) * kx, y: (ly + h / 2) * ky, k: kx / scale };
     };
 
     const drawTo = (e) => {
@@ -978,6 +1267,40 @@
     requestAnimationFrame(frame);
   }
 
+  /* 9. VOLTAR AO TOPO ---------------------------------------------------- */
+  // Botão no canto inferior direito, no estilo da navbar. Sobe quando a seção
+  // de contato aparece e leva de volta ao início da página.
+  function initBackToTop() {
+    const contact = document.getElementById("contact");
+    if (!contact) return;
+
+    const wrap = document.createElement("div");
+    wrap.className = "to-top";
+    wrap.innerHTML =
+      '<button class="to-top__btn" type="button" aria-label="Back to top" data-tooltip="Back to top">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" ' +
+      'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg></button>';
+    document.body.appendChild(wrap);
+
+    wrap.querySelector("button").addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+    });
+
+    const show = (on) => wrap.classList.toggle("is-visible", on);
+    if ("IntersectionObserver" in window) {
+      // Aparece quando o contato entra nos 60% de cima da tela
+      new IntersectionObserver(([entry]) => show(entry.isIntersecting), {
+        rootMargin: "0px 0px -40% 0px",
+      }).observe(contact);
+    } else {
+      const check = () => show(contact.getBoundingClientRect().top < window.innerHeight * 0.6);
+      window.addEventListener("scroll", check, { passive: true });
+      check();
+    }
+  }
+
+  initBackToTop();
   initTypewriter();
   initNav();
   initDraggableCards();
