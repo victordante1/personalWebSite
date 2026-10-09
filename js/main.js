@@ -1300,6 +1300,30 @@
     }
   }
 
+  /* 10. EXPERIÊNCIA: PASTAS QUE ABREM (ABOUT) ------------------------------- */
+  // Com mouse, o CSS abre a pasta no hover (e no foco por teclado).
+  // Em tela de toque não existe hover: tocar abre a pasta, tocar de novo fecha,
+  // e a pasta atual já começa aberta para mostrar como funciona.
+  function initFolders() {
+    const folders = Array.from(document.querySelectorAll(".folder"));
+    if (!folders.length) return;
+    const canHover = window.matchMedia("(hover: hover) and (pointer: fine)");
+
+    if (!canHover.matches) {
+      const current = document.querySelector(".folder--current") || folders[0];
+      current.classList.add("is-open");
+    }
+
+    folders.forEach((folder) => {
+      folder.addEventListener("click", () => {
+        if (canHover.matches) return;
+        const open = !folder.classList.contains("is-open");
+        folders.forEach((f) => f.classList.remove("is-open"));
+        folder.classList.toggle("is-open", open);
+      });
+    });
+  }
+
   initBackToTop();
   initTypewriter();
   initNav();
@@ -1309,4 +1333,5 @@
   initTextScramble();
   initIdCard();
   initNavSlider();
+  initFolders();
 })();

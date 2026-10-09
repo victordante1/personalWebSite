@@ -9,7 +9,6 @@
   <meta name="robots" content="index, follow">
   <meta name="author" content="Victor Dante">
   <meta name="theme-color" content="#02b801">
-  <link rel="icon" type="image/x-icon" href="img/dante site logo.png">
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
@@ -113,27 +112,19 @@
           <p class="about-lead">I'm Victor Dante, a designer based in Maceió, Brazil. My roots are in visual design, and I'm currently expanding my practice into UI/UX and front-end development.</p>
         </div>
 
-        <div class="about-pillars">
-          <article class="about-pillar">
-            <span class="about-pillar__number">01</span>
-            <h2>Visual Design</h2>
-            <p>Brand identities, editorial pieces, campaigns, motion graphics, social media and environmental applications. I care about hierarchy, rhythm and the details that make a visual system feel intentional.</p>
+        <div class="about-cards about-pillars">
+          <article class="about-card">
+            <div class="about-card__head"><span class="about-card__num" aria-hidden="true">01</span><h2 class="about-card__title">Visual Design</h2></div>
+            <p class="about-card__text">Brand identities, editorial pieces, campaigns, motion graphics, social media and environmental applications. I care about hierarchy, rhythm and the details that make a visual system feel intentional.</p>
           </article>
-          <article class="about-pillar">
-            <span class="about-pillar__number">02</span>
-            <h2>UI/UX Design</h2>
-            <p>I approach interfaces through structure and behavior: user flows, wireframes, prototypes and visual systems that balance clarity, usability and personality.</p>
+          <article class="about-card">
+            <div class="about-card__head"><span class="about-card__num" aria-hidden="true">02</span><h2 class="about-card__title">UI/UX Design</h2></div>
+            <p class="about-card__text">I approach interfaces through structure and behavior: user flows, wireframes, prototypes and visual systems that balance clarity, usability and personality.</p>
           </article>
-          <article class="about-pillar">
-            <span class="about-pillar__number">03</span>
-            <h2>Front-end</h2>
-            <p>I turn designs into responsive interfaces with HTML, CSS and JavaScript, while continuing to develop my skills with React and modern web workflows.</p>
+          <article class="about-card">
+            <div class="about-card__head"><span class="about-card__num" aria-hidden="true">03</span><h2 class="about-card__title">Front-end</h2></div>
+            <p class="about-card__text">I turn designs into responsive interfaces with HTML, CSS and JavaScript, while continuing to develop my skills with React and modern web workflows.</p>
           </article>
-        </div>
-
-        <div class="about-manifesto">
-          <span class="about-manifesto__label">ONE CRAFT</span>
-          <p>The same idea, seen through three lenses: <strong>visual design, UI/UX and code.</strong></p>
         </div>
       </div>
     </section>
@@ -148,11 +139,10 @@
             <p class="section-description">The tools I use to move from visual concept to interface and implementation.</p>
           </div>
         </div>
-        <div class="tech-groups">
-          <article class="tech-group">
-            <span class="tech-group__number">01</span>
-            <h3 class="resume__title">Design & Motion</h3>
-            <ul class="tech-list">
+        <div class="about-cards">
+          <article class="about-card">
+            <div class="about-card__head"><span class="about-card__num" aria-hidden="true">01</span><h3 class="about-card__title">Design &amp; Motion</h3></div>
+            <ul class="about-panel tech-list">
               <li class="tech-item"><img src="img/tech/photoshop.svg" alt="" aria-hidden="true"><span>Photoshop</span></li>
               <li class="tech-item"><img src="img/tech/illustrator.svg" alt="" aria-hidden="true"><span>Illustrator</span></li>
               <li class="tech-item"><img src="img/tech/aftereffects.svg" alt="" aria-hidden="true"><span>After Effects</span></li>
@@ -160,20 +150,18 @@
               <li class="tech-item"><img src="img/tech/figma.svg" alt="" aria-hidden="true"><span>Figma</span></li>
             </ul>
           </article>
-          <article class="tech-group">
-            <span class="tech-group__number">02</span>
-            <h3 class="resume__title">Front-end</h3>
-            <ul class="tech-list">
+          <article class="about-card">
+            <div class="about-card__head"><span class="about-card__num" aria-hidden="true">02</span><h3 class="about-card__title">Front-end</h3></div>
+            <ul class="about-panel tech-list">
               <li class="tech-item"><img src="img/tech/html5.svg" alt="" aria-hidden="true"><span>HTML</span></li>
               <li class="tech-item"><img src="img/tech/css3.svg" alt="" aria-hidden="true"><span>CSS</span></li>
               <li class="tech-item"><img src="img/tech/javascript.svg" alt="" aria-hidden="true"><span>JavaScript</span></li>
               <li class="tech-item"><img src="img/tech/react.svg" alt="" aria-hidden="true"><span>React</span></li>
             </ul>
           </article>
-          <article class="tech-group">
-            <span class="tech-group__number">03</span>
-            <h3 class="resume__title">Workflow</h3>
-            <ul class="tech-list">
+          <article class="about-card">
+            <div class="about-card__head"><span class="about-card__num" aria-hidden="true">03</span><h3 class="about-card__title">Workflow</h3></div>
+            <ul class="about-panel tech-list">
               <li class="tech-item"><img src="img/tech/git.svg" alt="" aria-hidden="true"><span>Git</span></li>
               <li class="tech-item"><img src="img/tech/github.svg" alt="" aria-hidden="true"><span>GitHub</span></li>
               <li class="tech-item"><img src="img/tech/responsive.svg" alt="" aria-hidden="true"><span>Responsive Design</span></li>
@@ -184,121 +172,161 @@
       </div>
     </section>
 
-    <section class="resume" aria-label="Experience and education">
+    <section class="resume experience-section" aria-labelledby="experience-title">
       <div class="resume__inner">
-        <div class="exp-intro">
-          <img class="exp-icon" src="img/exp icon.svg" alt="" aria-hidden="true">
+        <div class="section-heading">
+          <div class="section-heading__icon"><img class="exp-icon" src="img/exp icon.svg" alt="" aria-hidden="true"></div>
           <div>
+            <span class="section-eyebrow">CAREER</span>
             <h2 class="h2" id="experience-title">Professional experience</h2>
-            <p class="experience-intro">A short timeline of where I've worked, what I've learned, and how my practice has evolved.</p>
+            <p class="section-description">A short timeline of where I've worked, what I've learned, and how my practice has evolved.</p>
           </div>
         </div>
 
-        <ol class="experience-timeline" aria-labelledby="experience-title">
-          <li class="experience-timeline__item experience-timeline__item--current">
-            <div class="experience-timeline__date" aria-label="May 2026 to present">
+        <ol class="timeline" aria-labelledby="experience-title">
+          <li class="timeline__item timeline__item--green timeline__item--current">
+            <div class="timeline__date" aria-label="May 2026 to present">
               <span>05/2026</span>
-              <span class="experience-timeline__date-end">NOW</span>
+              <span class="timeline__date-end">NOW</span>
             </div>
-            <div class="experience-timeline__marker" aria-hidden="true"></div>
-            <article class="experience-timeline__content">
-              <div class="experience-timeline__current-label">CURRENT</div>
-              <h3 class="resume__title">System Idiomas</h3>
-              <p class="resume__role">Institutional Designer</p>
-              <div class="experience-timeline__tags" aria-label="Areas of work"><span>Branding</span><span>Campaigns</span><span>Social Media</span><span>Digital</span></div>
-              <p class="resume__text">I create visual materials for the school’s marketing and communication, including social media content, promotional campaigns, event materials, digital and print assets, and visual identities for specific initiatives. I also work with art direction, typography, composition, and visual hierarchy while maintaining brand consistency across different formats and channels.</p>
+            <div class="timeline__marker" aria-hidden="true"></div>
+            <article class="folder folder--current" tabindex="0">
+              <header class="folder__tab">
+                <h3 class="folder__name">System Idiomas</h3>
+                <span class="folder__chev" aria-hidden="true"></span>
+              </header>
+              <div class="folder__panel">
+                <div class="folder__inner">
+                  <div class="folder__content">
+                    <div class="folder__top">
+                      <p class="folder__role">Institutional Designer</p>
+                      <span class="folder__current">Current</span>
+                    </div>
+                    <ul class="folder__tags" aria-label="Areas of work"><li>Branding</li><li>Campaigns</li><li>Social Media</li><li>Digital</li></ul>
+                    <p class="folder__text">I create visual materials for the school’s marketing and communication, including social media content, promotional campaigns, event materials, digital and print assets, and visual identities for specific initiatives. I also work with art direction, typography, composition, and visual hierarchy while maintaining brand consistency across different formats and channels.</p>
+                  </div>
+                </div>
+              </div>
             </article>
           </li>
 
-          <li class="experience-timeline__item">
-            <div class="experience-timeline__date" aria-label="January 2025 to May 2026">
+          <li class="timeline__item timeline__item--blue">
+            <div class="timeline__date" aria-label="January 2025 to May 2026">
               <span>01/2025</span>
-              <span class="experience-timeline__date-end">05/2026</span>
+              <span class="timeline__date-end">05/2026</span>
             </div>
-            <div class="experience-timeline__marker" aria-hidden="true"></div>
-            <article class="experience-timeline__content">
-              <h3 class="resume__title">TRE-AL</h3>
-              <p class="resume__role">Institutional Designer — Intern</p>
-              <div class="experience-timeline__tags" aria-label="Areas of work"><span>Editorial</span><span>Illustration</span><span>Campaigns</span><span>Public Communication</span></div>
-              <p class="resume__text">I created graphic materials for informational campaigns, social media, print collateral, and digital content focused on citizenship, informed voting, and electoral transparency. I worked with communication, legal, and administrative teams to translate technical and legal content into clear and accessible visual formats.</p>
+            <div class="timeline__marker" aria-hidden="true"></div>
+            <article class="folder" tabindex="0">
+              <header class="folder__tab">
+                <h3 class="folder__name">TRE-AL</h3>
+                <span class="folder__chev" aria-hidden="true"></span>
+              </header>
+              <div class="folder__panel">
+                <div class="folder__inner">
+                  <div class="folder__content">
+                    <div class="folder__top">
+                      <p class="folder__role">Institutional Designer — Intern</p>
+                    </div>
+                    <ul class="folder__tags" aria-label="Areas of work"><li>Editorial</li><li>Illustration</li><li>Campaigns</li><li>Public Communication</li></ul>
+                    <p class="folder__text">I created graphic materials for informational campaigns, social media, print collateral, and digital content focused on citizenship, informed voting, and electoral transparency. I worked with communication, legal, and administrative teams to translate technical and legal content into clear and accessible visual formats.</p>
+                  </div>
+                </div>
+              </div>
             </article>
           </li>
 
-          <li class="experience-timeline__item">
-            <div class="experience-timeline__date" aria-label="April 2024 to February 2025">
+          <li class="timeline__item timeline__item--yellow">
+            <div class="timeline__date" aria-label="April 2024 to February 2025">
               <span>04/2024</span>
-              <span class="experience-timeline__date-end">02/2025</span>
+              <span class="timeline__date-end">02/2025</span>
             </div>
-            <div class="experience-timeline__marker" aria-hidden="true"></div>
-            <article class="experience-timeline__content">
-              <h3 class="resume__title">CRF-AL</h3>
-              <p class="resume__role">Institutional Designer — Intern</p>
-              <div class="experience-timeline__tags" aria-label="Areas of work"><span>Educational</span><span>Institutional</span><span>Digital</span><span>Print</span></div>
-              <p class="resume__text">I designed visual materials for institutional and educational campaigns across digital and print media. I transformed technical and regulatory information into clear and accessible content while collaborating with communication and compliance teams to ensure consistent use of the Council’s visual identity.</p>
+            <div class="timeline__marker" aria-hidden="true"></div>
+            <article class="folder" tabindex="0">
+              <header class="folder__tab">
+                <h3 class="folder__name">CRF-AL</h3>
+                <span class="folder__chev" aria-hidden="true"></span>
+              </header>
+              <div class="folder__panel">
+                <div class="folder__inner">
+                  <div class="folder__content">
+                    <div class="folder__top">
+                      <p class="folder__role">Institutional Designer — Intern</p>
+                    </div>
+                    <ul class="folder__tags" aria-label="Areas of work"><li>Educational</li><li>Institutional</li><li>Digital</li><li>Print</li></ul>
+                    <p class="folder__text">I designed visual materials for institutional and educational campaigns across digital and print media. I transformed technical and regulatory information into clear and accessible content while collaborating with communication and compliance teams to ensure consistent use of the Council’s visual identity.</p>
+                  </div>
+                </div>
+              </div>
             </article>
           </li>
 
-          <li class="experience-timeline__item">
-            <div class="experience-timeline__date" aria-label="May 2023 to December 2023">
+          <li class="timeline__item timeline__item--red">
+            <div class="timeline__date" aria-label="May 2023 to December 2023">
               <span>05/2023</span>
-              <span class="experience-timeline__date-end">12/2023</span>
+              <span class="timeline__date-end">12/2023</span>
             </div>
-            <div class="experience-timeline__marker" aria-hidden="true"></div>
-            <article class="experience-timeline__content">
-              <h3 class="resume__title">Ili Agency</h3>
-              <p class="resume__role">Graphic Designer — Intern</p>
-              <div class="experience-timeline__tags" aria-label="Areas of work"><span>Branding</span><span>Digital Campaigns</span><span>Client Work</span></div>
-              <p class="resume__text">I developed visual solutions for a variety of clients, including Dentalis, Moura Dubeux, and Roomo. I created digital campaigns and graphic materials that communicated each brand’s identity and values, translating briefs into creative and functional pieces across different platforms.</p>
+            <div class="timeline__marker" aria-hidden="true"></div>
+            <article class="folder" tabindex="0">
+              <header class="folder__tab">
+                <h3 class="folder__name">Ili Agency</h3>
+                <span class="folder__chev" aria-hidden="true"></span>
+              </header>
+              <div class="folder__panel">
+                <div class="folder__inner">
+                  <div class="folder__content">
+                    <div class="folder__top">
+                      <p class="folder__role">Graphic Designer — Intern</p>
+                    </div>
+                    <ul class="folder__tags" aria-label="Areas of work"><li>Branding</li><li>Digital Campaigns</li><li>Client Work</li></ul>
+                    <p class="folder__text">I developed visual solutions for a variety of clients, including Dentalis, Moura Dubeux, and Roomo. I created digital campaigns and graphic materials that communicated each brand’s identity and values, translating briefs into creative and functional pieces across different platforms.</p>
+                  </div>
+                </div>
+              </div>
             </article>
           </li>
         </ol>
+      </div>
+    </section>
 
-        <div class="experience-now" aria-label="Current professional direction">
-          <span class="experience-now__eyebrow">NOW</span>
+    <section class="licenses" aria-labelledby="learning-title">
+      <div class="resume__inner">
+        <div class="section-heading">
+          <div class="section-heading__icon"><img class="lic-icon" src="img/lic icon.svg" alt="" aria-hidden="true"></div>
           <div>
-            <h3 class="experience-now__title">Expanding my practice into</h3>
-            <p class="experience-now__focus"><span>UI/UX DESIGN</span><b>+</b><span>FRONT-END DEVELOPMENT</span></p>
-            <p class="experience-now__tools">Figma · HTML · CSS · JavaScript · React</p>
+            <span class="section-eyebrow">LEARNING</span>
+            <h2 class="h2" id="learning-title">Education &amp; certifications</h2>
+            <p class="section-description">A mix of formal education, courses and events that shape the way I work.</p>
           </div>
         </div>
-
-        <section class="learning-section" aria-labelledby="learning-title">
-          <div class="section-heading">
-            <div class="section-heading__icon"><img class="lic-icon" src="img/lic icon.svg" alt="" aria-hidden="true"></div>
-            <div>
-              <span class="section-eyebrow">LEARNING</span>
-              <h2 class="h2" id="learning-title">Education & certifications</h2>
-              <p class="section-description">A mix of formal education, courses and events that shape the way I work.</p>
+        <div class="about-cards">
+          <article class="about-card">
+            <div class="about-card__head"><span class="about-card__num" aria-hidden="true">01</span><h3 class="about-card__title">Education</h3></div>
+            <div class="about-panel degree">
+              <p class="degree__name">Design</p>
+              <p class="degree__level">Bachelor's Degree</p>
+              <p class="degree__school">Federal University of Alagoas (UFAL)</p>
+              <span class="degree__meta">Expected graduation · 2027.1</span>
             </div>
-          </div>
-          <div class="learning-grid" aria-labelledby="learning-title">
-            <article class="learning-card learning-card--degree">
-              <span class="learning-card__eyebrow">EDUCATION</span>
-              <h3 class="resume__title">Design</h3>
-              <p class="learning-card__main">Bachelor's Degree</p>
-              <p class="resume__text">Federal University of Alagoas (UFAL)</p>
-              <span class="learning-card__meta">Expected graduation · 2027.1</span>
-            </article>
-            <article class="learning-card">
-              <span class="learning-card__eyebrow">COURSES</span>
-              <ul class="resume__bullets">
-                <li>Design and Launching of Digital Products | Santander Open Academy</li>
-                <li>From Figma to Code: Complete Web Interface Design Course | Udemy</li>
-                <li>Front-end Development Training in HTML, CSS, and JavaScript | Udemy</li>
-                <li>Cybersecurity Fundamentals | Santander Open Academy</li>
-                <li>English Fundamentals: Successful Networking and Interviews | Santander Open Academy</li>
-              </ul>
-            </article>
-            <article class="learning-card">
-              <span class="learning-card__eyebrow">EVENTS</span>
-              <ul class="resume__bullets">
-                <li>Roga DX 2026 | Roga DX</li>
-                <li>Proud Tech Summit 2026 | Starian</li>
-                <li>Capacitate+ Build with Gemini | Google</li>
-              </ul>
-            </article>
-          </div>
-        </section>
+          </article>
+          <article class="about-card">
+            <div class="about-card__head"><span class="about-card__num" aria-hidden="true">02</span><h3 class="about-card__title">Courses</h3></div>
+            <ul class="about-panel learning-list">
+              <li><span class="learning-list__name">Design and Launching of Digital Products</span><span class="learning-list__org">Santander Open Academy</span></li>
+              <li><span class="learning-list__name">From Figma to Code: Complete Web Interface Design Course</span><span class="learning-list__org">Udemy</span></li>
+              <li><span class="learning-list__name">Front-end Development Training in HTML, CSS, and JavaScript</span><span class="learning-list__org">Udemy</span></li>
+              <li><span class="learning-list__name">Cybersecurity Fundamentals</span><span class="learning-list__org">Santander Open Academy</span></li>
+              <li><span class="learning-list__name">English Fundamentals: Successful Networking and Interviews</span><span class="learning-list__org">Santander Open Academy</span></li>
+            </ul>
+          </article>
+          <article class="about-card">
+            <div class="about-card__head"><span class="about-card__num" aria-hidden="true">03</span><h3 class="about-card__title">Events</h3></div>
+            <ul class="about-panel learning-list">
+              <li><span class="learning-list__name">Roga DX 2026</span><span class="learning-list__org">Roga DX</span></li>
+              <li><span class="learning-list__name">Proud Tech Summit 2026</span><span class="learning-list__org">Starian</span></li>
+              <li><span class="learning-list__name">Capacitate+ Build with Gemini</span><span class="learning-list__org">Google</span></li>
+            </ul>
+          </article>
+        </div>
       </div>
     </section>
   </main>
