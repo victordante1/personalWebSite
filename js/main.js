@@ -1,16 +1,69 @@
 /* ==========================================================================
    Victor Dante | Portfolio
-   1 Navbar que some gradualmente   2 Cards arrastáveis (home)   3 Formulário
-   4 Foto do hero com transformação livre   5 Texto que embaralha (duplo clique)
-   6 Identidade da página About (riscar e mover)
-   7 Navbar: marcador da página atual desliza entre os itens
-   8 Texto da home sendo digitado
+   0 Utilitários compartilhados
+   1 Navbar que some gradualmente        2 Cards arrastáveis (home e Work)
+   3 Formulário de contato               4 Foto do hero com transformação livre
+   5 Texto que embaralha (clique)        6 Identidade da página About (riscar e mover)
+   7 Navbar: marcador da página atual    8 Texto da home sendo digitado
+   9 Voltar ao topo                      10 Experiência: pastas que abrem (About)
+
+   Um único script clássico (sem type="module") de propósito: módulos ES não
+   carregam quando o site é aberto direto do disco (file://).
    ========================================================================== */
 (() => {
   "use strict";
 
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  /* 0. UTILITÁRIOS ------------------------------------------------------- */
+  const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+  // Função (e não constante) para respeitar mudanças feitas com a página aberta
+  const reduceMotion = () => motionQuery.matches;
+
   const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+  // Setas do teclado -> deslocamento [dx, dy] multiplicado por step (null se não for seta)
+  const ARROWS = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+  const arrowDelta = (e, step) => {
+    const dir = ARROWS[e.key];
+    return dir ? [dir[0] * step, dir[1] * step] : null;
+  };
+
+  // Executa fn depois que o redimensionamento da janela "assenta"
+  const onResize = (fn, delay = 150) => {
+    let timer = 0;
+    window.addEventListener("resize", () => {
+      clearTimeout(timer);
+      timer = setTimeout(fn, delay);
+    });
+  };
+
+  // Elementos que o usuário arrasta guardam o deslocamento em s = { x, y }.
+  // Limites desse deslocamento (coords de documento) para o elemento nunca sair da página.
+  const docBounds = (el, s) => {
+    const rect = el.getBoundingClientRect();
+    const w = el.offsetWidth;
+    const h = el.offsetHeight;
+    const restLeft = rect.left + rect.width / 2 + window.scrollX - w / 2 - s.x;
+    const restTop = rect.top + rect.height / 2 + window.scrollY - h / 2 - s.y;
+    const root = document.documentElement;
+    return {
+      minX: -restLeft,
+      maxX: root.clientWidth - w - restLeft,
+      minY: -restTop,
+      maxY: root.scrollHeight - h - restTop,
+    };
+  };
+
+  // Move s em (dx, dy) sem deixar o elemento sair da página. Com (0, 0) só corrige.
+  const nudge = (el, s, dx = 0, dy = 0) => {
+    const b = docBounds(el, s);
+    s.x = clamp(s.x + dx, b.minX, b.maxX);
+    s.y = clamp(s.y + dy, b.minY, b.maxY);
+  };
+
+  // Inclinação de "objeto sendo arrastado": acompanha o movimento horizontal e volta sozinha
+  const TILT_MAX = 8;
+  const tiltToward = (r, dx) => clamp(r * 0.6 + dx * 0.5, -TILT_MAX, TILT_MAX);
+  const tiltDecay = (r) => r * 0.92;
 
   /* 1. NAVBAR ------------------------------------------------------------ */
   // A barra é fixa e vai perdendo opacidade conforme o centro da tela se
@@ -59,7 +112,7 @@
   /* 2. CARDS ARRASTÁVEIS ------------------------------------------------- */
   // Arrasta e solta pela página inteira. O card mantém o lugar onde foi solto.
   // Mouse/caneta: qualquer parte do card. Toque: só a imagem (o resto rola a página).
-  // Teclado: foco no card + setas (Shift move mais rápido).
+  // Teclado: foco no card + setas (Shift move mais rápido), Esc devolve ao lugar.
   function initDraggableCards() {
     const cards = Array.from(document.querySelectorAll("[data-drag]"));
     if (!cards.length) return;
@@ -73,6 +126,7 @@
     // se soltar ali, encaixa. Slots ocupados não atraem nem aceitam: o card só fica por cima.
     const MAGNET_RATIO = 0.5;
     const SLOT_TEXT = "cool project here";
+    const CORNERS = ["peel-tl", "peel-tr", "peel-bl", "peel-br"];
 
     // Cada card ganha um "slot" no grid: um contorno tracejado, no formato do card,
     // que fica no lugar de origem e só aparece quando o card está fora dele.
@@ -97,8 +151,8 @@
     const states = new Map(
       cards.map((card) => [card, { x: 0, y: 0, r: 0, tilt: 0, fold: 0, cx: -1, cy: -1, R: 0 }])
     );
-    const CORNERS = ["peel-tl", "peel-tr", "peel-bl", "peel-br"];
     let zTop = 20;
+    const bringToFront = (card) => (card.style.zIndex = String(++zTop));
 
     // Em telas de 1100px ou menos o arrasto fica desligado: os cards voltam ao
     // lugar, deixam de ser focáveis como "arrastáveis" e as setas não movem nada.
@@ -167,29 +221,7 @@
       } else {
         card.style.clipPath = "";
       }
-      const slot = card.parentElement;
-      if (s.x || s.y) slot.classList.add("is-away");
-      else slot.classList.remove("is-away");
-    };
-
-    // Limites em coordenadas de documento, para o card nunca sair da página
-    const getBounds = (card) => {
-      const s = states.get(card);
-      const rect = card.getBoundingClientRect();
-      const w = card.offsetWidth;
-      const h = card.offsetHeight;
-      const cx = rect.left + rect.width / 2 + window.scrollX;
-      const cy = rect.top + rect.height / 2 + window.scrollY;
-      const restLeft = cx - w / 2 - s.x;
-      const restTop = cy - h / 2 - s.y;
-      const docW = document.documentElement.clientWidth;
-      const docH = document.documentElement.scrollHeight;
-      return {
-        minX: -restLeft,
-        maxX: docW - w - restLeft,
-        minY: -restTop,
-        maxY: docH - h - restTop,
-      };
+      card.parentElement.classList.toggle("is-away", Boolean(s.x || s.y));
     };
 
     const settling = new Map();
@@ -213,7 +245,7 @@
       cancelSettle(card);
       const s = states.get(card);
       const from = { x: s.x, y: s.y, r: s.r, tilt: s.tilt, fold: s.fold };
-      const dur = reduceMotion ? 0 : Math.min(360, 200 + (toHome ? Math.hypot(s.x, s.y) * 0.6 : 0));
+      const dur = reduceMotion() ? 0 : Math.min(360, 200 + (toHome ? Math.hypot(s.x, s.y) * 0.6 : 0));
       card.classList.remove("is-dragging");
       card.classList.add("no-anim");
       const t0 = performance.now();
@@ -264,7 +296,7 @@
       render(B);
       void A.offsetWidth; // aplica as posições sem transição
       B.classList.remove("no-anim");
-      A.style.zIndex = String(++zTop);
+      bringToFront(A);
       settle(A, true);
     };
 
@@ -272,11 +304,9 @@
       const s = states.get(card);
       let drag = null;
       let raf = 0;
+      let suppressClick = false;
       const slotOf = () => card.parentElement;
-      const springBack = () => {
-        clearMarks();
-        settle(card, true);
-      };
+
       // Tracejado escuro no slot que vai receber o card se soltar agora
       const markTarget = (el) => {
         if (drag.marked === el) return;
@@ -284,7 +314,6 @@
         drag.marked = el;
         if (el) el.classList.add(el === slotOf() ? "is-armed" : "is-target");
       };
-      let suppressClick = false;
 
       const place = () => {
         const px = drag.cx + window.scrollX;
@@ -314,7 +343,7 @@
         s.y = tcy - drag.own.cy;
         drag.target = near ? best.el : null;
         // Descolando / assentando: a dobra cresce até a metade do raio e some no centro e fora do ímã
-        const peel = reduceMotion || bd < 1 ? 0 : Math.sin(Math.PI * Math.min(bd / radius, 1));
+        const peel = reduceMotion() || bd < 1 ? 0 : Math.sin(Math.PI * Math.min(bd / radius, 1));
         s.tilt = peel * 12;
         s.fold = peel * card.offsetWidth * 0.34;
       };
@@ -328,7 +357,7 @@
         if (dy) window.scrollBy(0, dy);
         place();
         markTarget(drag.target);
-        if (!reduceMotion) s.r *= 0.92;
+        if (!reduceMotion()) s.r = tiltDecay(s.r);
         render(card);
         raf = requestAnimationFrame(loop);
       };
@@ -348,10 +377,11 @@
           startY: e.clientY + window.scrollY,
           sx: s.x,
           sy: s.y,
-          bounds: getBounds(card),
+          bounds: docBounds(card, s),
+          target: null,
         };
-        // Centros de todos os slots (coords de documento) para o ímã
-        // Só atraem o slot do próprio card e slots vazios (cujo card está solto e parado)
+        // Centros (coords de documento) dos slots que atraem: o do próprio card e os
+        // vazios (cujo card está solto e parado)
         const candidates = Array.from(document.querySelectorAll(".card-slot")).filter(
           (el) =>
             el === slotOf() ||
@@ -362,7 +392,6 @@
           return { el, cx: r.left + r.width / 2 + window.scrollX, cy: r.top + r.height / 2 + window.scrollY };
         });
         drag.own = drag.slots.find((sl) => sl.el === slotOf());
-        drag.target = null;
         const rect = card.getBoundingClientRect();
         s.cx = e.clientX - rect.left < rect.width / 2 ? -1 : 1;
         s.cy = e.clientY - rect.top < rect.height / 2 ? -1 : 1;
@@ -390,13 +419,13 @@
           drag.active = true;
           card.setPointerCapture(drag.id);
           card.classList.add("is-dragging");
-          card.style.zIndex = String(++zTop);
+          bringToFront(card);
           raf = requestAnimationFrame(loop);
         }
 
         const dx = e.clientX - drag.prevX;
         drag.prevX = e.clientX;
-        if (!reduceMotion) s.r = clamp(s.r * 0.6 + dx * 0.5, -8, 8);
+        if (!reduceMotion()) s.r = tiltToward(s.r, dx);
         place();
         markTarget(drag.target);
         render(card);
@@ -441,22 +470,17 @@
       card.addEventListener("keydown", (e) => {
         if (noDrag.matches || e.target !== card) return;
         if (e.key === "Escape") {
-          if (s.x || s.y) springBack();
+          if (s.x || s.y) {
+            clearMarks();
+            settle(card, true);
+          }
           return;
         }
-        const step = e.shiftKey ? KEY_STEP * 3 : KEY_STEP;
-        const delta = {
-          ArrowLeft: [-step, 0],
-          ArrowRight: [step, 0],
-          ArrowUp: [0, -step],
-          ArrowDown: [0, step],
-        }[e.key];
+        const delta = arrowDelta(e, e.shiftKey ? KEY_STEP * 3 : KEY_STEP);
         if (!delta) return;
         e.preventDefault();
-        const b = getBounds(card);
-        s.x = clamp(s.x + delta[0], b.minX, b.maxX);
-        s.y = clamp(s.y + delta[1], b.minY, b.maxY);
-        card.style.zIndex = String(++zTop);
+        nudge(card, s, ...delta);
+        bringToFront(card);
         render(card);
       });
     });
@@ -484,19 +508,12 @@
     syncDragMode();
 
     // Ao redimensionar, mantém os cards dentro da página
-    let resizeTimer = 0;
-    window.addEventListener("resize", () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        if (noDrag.matches) return;
-        cards.forEach((card) => {
-          const s = states.get(card);
-          const b = getBounds(card);
-          s.x = clamp(s.x, b.minX, b.maxX);
-          s.y = clamp(s.y, b.minY, b.maxY);
-          render(card);
-        });
-      }, 150);
+    onResize(() => {
+      if (noDrag.matches) return;
+      cards.forEach((card) => {
+        nudge(card, states.get(card));
+        render(card);
+      });
     });
   }
 
@@ -519,20 +536,23 @@
       subject: (v) => (v ? "" : "Enter a subject."),
       message: (v) => (v.length >= 10 ? "" : "Write at least 10 characters."),
     };
+    const fields = Object.keys(rules);
+    const valueOf = (name) => form.elements[name].value.trim();
 
     const validateField = (name) => {
       const input = form.elements[name];
       const error = form.querySelector(`[data-error-for="${name}"]`);
-      const message = rules[name](input.value.trim());
+      const message = rules[name](valueOf(name));
       input.setAttribute("aria-invalid", message ? "true" : "false");
       error.textContent = message;
       return message === "";
     };
 
-    Object.keys(rules).forEach((name) => {
-      form.elements[name].addEventListener("blur", () => validateField(name));
-      form.elements[name].addEventListener("input", () => {
-        if (form.elements[name].getAttribute("aria-invalid") === "true") validateField(name);
+    fields.forEach((name) => {
+      const input = form.elements[name];
+      input.addEventListener("blur", () => validateField(name));
+      input.addEventListener("input", () => {
+        if (input.getAttribute("aria-invalid") === "true") validateField(name);
       });
     });
 
@@ -540,21 +560,17 @@
       e.preventDefault();
       status.textContent = "";
 
-      const invalid = Object.keys(rules).filter((name) => !validateField(name));
+      // filter passa por todos os campos, então todos os erros aparecem de uma vez
+      const invalid = fields.filter((name) => !validateField(name));
       if (invalid.length) {
         form.elements[invalid[0]].focus();
         status.textContent = "Fix the highlighted fields and send again.";
         return;
       }
 
-      const name = form.elements.name.value.trim();
-      const email = form.elements.email.value.trim();
-      const subject = form.elements.subject.value.trim();
-      const message = form.elements.message.value.trim();
-
       // --- trocar aqui por fetch() quando houver back-end ---
-      const body = `${message}\n\n${name}\n${email}`;
-      window.location.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      const body = `${valueOf("message")}\n\n${valueOf("name")}\n${valueOf("email")}`;
+      window.location.href = `mailto:${to}?subject=${encodeURIComponent(valueOf("subject"))}&body=${encodeURIComponent(body)}`;
       status.textContent = `Opening your email app. If nothing opens, write to ${to}.`;
     });
   }
@@ -569,11 +585,13 @@
   //  - Teclado: Enter seleciona, setas movem (Shift = mais rápido), + e - escalam
   //  - Esc ou clique fora: desmarca. Duplo clique na foto: volta ao original
   // Os valores ficam em % da área do hero__visual, então escalam com a tela.
-  // Cada ajuste imprime no console o CSS correspondente (para você copiar).
+  // Modo edição (abra a página com ?edit no fim da URL): cada ajuste imprime no
+  // console o CSS correspondente, para copiar para .hero-photo.
   function initFreeTransform() {
     const el = document.querySelector("[data-transform]");
     if (!el) return;
     const area = el.parentElement; // .hero__visual (position: relative)
+    const editMode = new URLSearchParams(window.location.search).has("edit");
 
     const MIN = 40; // tamanho mínimo em px
     const DIRS = {
@@ -612,6 +630,7 @@
 
     let logTimer = 0;
     const log = () => {
+      if (!editMode) return;
       clearTimeout(logTimer);
       logTimer = setTimeout(() => {
         console.info(
@@ -641,6 +660,14 @@
       const x = e.altKey ? s.x + (s.w - w) / 2 : dirX < 0 ? s.x + s.w - w : s.x;
       const y = e.altKey ? s.y + (s.h - h) / 2 : dirY < 0 ? s.y + s.h - h : s.y;
       return { x, y, w, h };
+    };
+
+    // Escala em torno do centro, sem passar do tamanho mínimo
+    const scaleBy = (r, factor) => {
+      const f = Math.max(factor, MIN / Math.min(r.w, r.h));
+      const w = r.w * f;
+      const h = r.h * f;
+      return { x: r.x - (w - r.w) / 2, y: r.y - (h - r.h) / 2, w, h };
     };
 
     let op = null;
@@ -705,14 +732,7 @@
       if (!isSelected()) return;
 
       const r = read();
-      const step = e.shiftKey ? 10 : 2;
-      const move = {
-        ArrowLeft: [-step, 0],
-        ArrowRight: [step, 0],
-        ArrowUp: [0, -step],
-        ArrowDown: [0, step],
-      }[e.key];
-
+      const move = arrowDelta(e, e.shiftKey ? 10 : 2);
       if (move) {
         e.preventDefault();
         write({ ...r, x: r.x + move[0], y: r.y + move[1] });
@@ -720,33 +740,35 @@
         return;
       }
 
-      if (["+", "=", "-", "_"].includes(e.key)) {
+      const grow = { "+": 1.05, "=": 1.05, "-": 1 / 1.05, _: 1 / 1.05 }[e.key];
+      if (grow) {
         e.preventDefault();
-        let f = e.key === "+" || e.key === "=" ? 1.05 : 1 / 1.05;
-        f = Math.max(f, MIN / Math.min(r.w, r.h));
-        const w = r.w * f;
-        const h = r.h * f;
-        write({ x: r.x - (w - r.w) / 2, y: r.y - (h - r.h) / 2, w, h });
+        write(scaleBy(r, grow));
         log();
       }
     });
   }
 
-  /* 5. TEXTO QUE EMBARALHA (duplo clique) --------------------------------- */
-  // Em qualquer elemento com data-scramble: duplo clique embaralha as letras
+  /* 5. TEXTO QUE EMBARALHA (clique) --------------------------------------- */
+  // Em qualquer elemento com data-scramble: um clique embaralha as letras
   // e, após instantes, elas voltam ao normal da esquerda para a direita.
   // Só as letras trocam de lugar (pontuação e espaços ficam fixos).
   // Ajuste os tempos abaixo para mudar o ritmo.
   function initTextScramble() {
     const targets = document.querySelectorAll("[data-scramble]");
-    if (!targets.length || reduceMotion) return; // respeita "reduzir movimento"
-
+    if (!targets.length || reduceMotion()) return; // respeita "reduzir movimento"
 
     const CLICKS = 1; // quantos cliques seguidos disparam o efeito
     const SHUFFLE_MS = 700; // tempo totalmente embaralhado
     const RESOLVE_MS = 600; // tempo em que as letras voltam ao lugar
     const TICK_MS = 50; // a cada quantos ms o embaralhado muda
     const isLetter = (ch) => /\p{L}/u.test(ch);
+
+    // Não mexe na cópia para leitores de tela criada pelo texto digitado (seção 8)
+    const visibleText = {
+      acceptNode: (node) =>
+        node.parentElement.closest(".sr-only") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT,
+    };
 
     const shuffle = (list) => {
       for (let i = list.length - 1; i > 0; i--) {
@@ -759,18 +781,17 @@
     targets.forEach((el) => {
       let running = false;
 
-      // Evita que o duplo clique selecione a palavra
+      // Evita que cliques seguidos selecionem a palavra
       el.addEventListener("mousedown", (e) => {
         if (e.detail > 1) e.preventDefault();
       });
 
       el.addEventListener("click", (e) => {
-        if (e.detail !== CLICKS) return;
-        if (running) return;
+        if (e.detail !== CLICKS || running) return;
         running = true;
 
-        // Guarda o texto original de cada nó (o <br> do HTML não é tocado)
-        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+        // Guarda o texto original de cada nó (elementos como <br> não são tocados)
+        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, visibleText);
         const nodes = [];
         while (walker.nextNode()) nodes.push(walker.currentNode);
         const originals = nodes.map((node) => Array.from(node.nodeValue));
@@ -872,23 +893,6 @@
         s.x || s.y || s.r ? `translate3d(${s.x}px, ${s.y}px, 0) rotate(${s.r}deg)` : "";
     };
 
-    // Limites em coordenadas de documento, para o cartão nunca sair da página
-    const getBounds = () => {
-      const rect = card.getBoundingClientRect();
-      const w = card.offsetWidth;
-      const h = card.offsetHeight;
-      const cx = rect.left + rect.width / 2 + window.scrollX;
-      const cy = rect.top + rect.height / 2 + window.scrollY;
-      const restLeft = cx - w / 2 - s.x;
-      const restTop = cy - h / 2 - s.y;
-      return {
-        minX: -restLeft,
-        maxX: document.documentElement.clientWidth - w - restLeft,
-        minY: -restTop,
-        maxY: document.documentElement.scrollHeight - h - restTop,
-      };
-    };
-
     /* Riscar -------------------------------------------------------------- */
     let stroke = null;
     let drag = null;
@@ -947,6 +951,14 @@
     };
 
     /* Ponteiro ------------------------------------------------------------ */
+    // O tilt volta sozinho quando o cartão para
+    const tiltLoop = () => {
+      if (!drag) return;
+      if (!reduceMotion()) s.r = tiltDecay(s.r);
+      render();
+      raf = requestAnimationFrame(tiltLoop);
+    };
+
     card.addEventListener("pointerdown", (e) => {
       if (e.pointerType === "touch") return;
       if (e.button !== 0) return;
@@ -959,18 +971,12 @@
           sy: s.y,
           startX: e.clientX + window.scrollX,
           startY: e.clientY + window.scrollY,
-          bounds: getBounds(),
+          bounds: docBounds(card, s),
         };
         card.setPointerCapture(e.pointerId);
         card.classList.add("is-dragging");
         card.style.zIndex = String(++zTop);
-        const loop = () => {
-          if (!drag) return;
-          if (!reduceMotion) s.r *= 0.92; // o tilt volta sozinho quando para
-          render();
-          raf = requestAnimationFrame(loop);
-        };
-        raf = requestAnimationFrame(loop);
+        raf = requestAnimationFrame(tiltLoop);
         e.preventDefault();
         return;
       }
@@ -983,7 +989,7 @@
       if (drag && e.pointerId === drag.id) {
         const dx = e.clientX - drag.px;
         drag.px = e.clientX;
-        if (!reduceMotion) s.r = clamp(s.r * 0.6 + dx * 0.5, -8, 8);
+        if (!reduceMotion()) s.r = tiltToward(s.r, dx);
         const px = e.clientX + window.scrollX;
         const py = e.clientY + window.scrollY;
         s.x = clamp(drag.sx + px - drag.startX, drag.bounds.minX, drag.bounds.maxX);
@@ -1044,31 +1050,17 @@
         return;
       }
       if (!isMove()) return;
-      const step = e.shiftKey ? KEY_STEP * 3 : KEY_STEP;
-      const delta = {
-        ArrowLeft: [-step, 0],
-        ArrowRight: [step, 0],
-        ArrowUp: [0, -step],
-        ArrowDown: [0, step],
-      }[e.key];
+      const delta = arrowDelta(e, e.shiftKey ? KEY_STEP * 3 : KEY_STEP);
       if (!delta) return;
       e.preventDefault();
-      const b = getBounds();
-      s.x = clamp(s.x + delta[0], b.minX, b.maxX);
-      s.y = clamp(s.y + delta[1], b.minY, b.maxY);
+      nudge(card, s, ...delta);
       render();
     });
 
     // Ao redimensionar, mantém o cartão dentro da página
-    let resizeTimer = 0;
-    window.addEventListener("resize", () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        const b = getBounds();
-        s.x = clamp(s.x, b.minX, b.maxX);
-        s.y = clamp(s.y, b.minY, b.maxY);
-        render();
-      }, 150);
+    onResize(() => {
+      nudge(card, s);
+      render();
     });
   }
 
@@ -1080,14 +1072,12 @@
     const nav = document.querySelector("[data-nav]");
     if (!nav) return;
     const links = Array.from(nav.querySelectorAll("a"));
-    if (!links.length) return;
+    const here = links.find((a) => a.getAttribute("aria-current") === "page");
+    if (!here) return;
 
     const SLIDE_DELAY = 90; // ms de pausa antes de começar a deslizar
     const MAX_AGE = 8000; // ms: passado esse tempo, a origem guardada é ignorada
     const KEY = "navSlideFrom";
-
-    const here = links.find((a) => a.getAttribute("aria-current") === "page");
-    if (!here) return;
 
     const current = document.createElement("span");
     current.className = "nav__current";
@@ -1096,8 +1086,8 @@
     nav.classList.add("nav--sliding");
 
     const place = (link) => {
-      current.style.width = link.offsetWidth + "px";
-      current.style.height = link.offsetHeight + "px";
+      current.style.width = `${link.offsetWidth}px`;
+      current.style.height = `${link.offsetHeight}px`;
       current.style.transform = `translateX(${link.offsetLeft}px)`;
     };
     const colorOf = (link) => getComputedStyle(link).getPropertyValue("--current-bg").trim();
@@ -1115,7 +1105,7 @@
     const stash = {
       set(value) {
         try { sessionStorage.setItem(KEY, value); } catch (_) {}
-        window.name = KEY + ":" + value;
+        window.name = `${KEY}:${value}`;
       },
       take() {
         let value = null;
@@ -1123,7 +1113,7 @@
           value = sessionStorage.getItem(KEY);
           sessionStorage.removeItem(KEY);
         } catch (_) {}
-        if (window.name.indexOf(KEY + ":") === 0) {
+        if (window.name.startsWith(`${KEY}:`)) {
           if (value === null) value = window.name.slice(KEY.length + 1);
           window.name = "";
         }
@@ -1153,13 +1143,13 @@
       link.addEventListener("click", (e) => {
         if (link === here) return;
         const href = link.getAttribute("href") || "";
-        if (href.charAt(0) === "#") return; // âncora da mesma página: sem recarregar
+        if (href.startsWith("#")) return; // âncora da mesma página: sem recarregar
         if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-        stash.set(links.indexOf(here) + "@" + Date.now());
+        stash.set(`${links.indexOf(here)}@${Date.now()}`);
       });
     });
 
-    window.addEventListener("resize", () => jump(here));
+    onResize(() => jump(here), 100);
   }
 
   /* 8. TEXTO SENDO DIGITADO (HOME) ------------------------------------------ */
@@ -1170,7 +1160,7 @@
   function initTypewriter() {
     const targets = Array.from(document.querySelectorAll("[data-type]"));
     if (!targets.length) return;
-    if (reduceMotion) {
+    if (reduceMotion()) {
       targets.forEach((el) => el.classList.add("tw-ready"));
       return;
     }
@@ -1190,41 +1180,40 @@
     const timeline = []; // { el: <span da letra>, at: ms desde o início }
     let t = START_DELAY;
 
+    // Divide um texto em palavras (spans que não quebram) feitas de letras (spans)
+    const splitText = (text, chars) => {
+      const frag = document.createDocumentFragment();
+      text.split(/(\s+)/).forEach((token) => {
+        if (!token) return;
+        if (/^\s+$/.test(token)) {
+          frag.appendChild(document.createTextNode(token));
+          return;
+        }
+        const word = document.createElement("span");
+        word.className = "tw-word";
+        Array.from(token).forEach((ch) => {
+          const c = document.createElement("span");
+          c.className = "tw-char";
+          c.textContent = ch;
+          word.appendChild(c);
+          chars.push(c);
+        });
+        frag.appendChild(word);
+      });
+      return frag;
+    };
+
     targets.forEach((el) => {
       const base = Number(el.dataset.typeSpeed) || DEFAULT_MS;
       const label = el.textContent.replace(/\s+/g, " ").trim();
 
-      // Move todo o conteúdo para um contêiner visual, dividindo o texto em
-      // palavras e letras (elementos como <br> são preservados)
+      // Move todo o conteúdo para um contêiner visual (elementos como <br> são preservados)
       const visual = document.createElement("span");
       visual.className = "tw";
       visual.setAttribute("aria-hidden", "true");
       const chars = [];
-
       Array.from(el.childNodes).forEach((node) => {
-        if (node.nodeType !== Node.TEXT_NODE) {
-          visual.appendChild(node);
-          return;
-        }
-        const frag = document.createDocumentFragment();
-        node.nodeValue.split(/(\s+)/).forEach((token) => {
-          if (!token) return;
-          if (/^\s+$/.test(token)) {
-            frag.appendChild(document.createTextNode(token));
-            return;
-          }
-          const word = document.createElement("span");
-          word.className = "tw-word";
-          Array.from(token).forEach((ch) => {
-            const c = document.createElement("span");
-            c.className = "tw-char";
-            c.textContent = ch;
-            word.appendChild(c);
-            chars.push(c);
-          });
-          frag.appendChild(word);
-        });
-        visual.appendChild(frag);
+        visual.appendChild(node.nodeType === Node.TEXT_NODE ? splitText(node.nodeValue, chars) : node);
       });
 
       const sr = document.createElement("span");
@@ -1244,8 +1233,8 @@
       t += GAP;
     });
 
-    if (!timeline.length) return;
     targets.forEach((el) => el.classList.add("tw-ready"));
+    if (!timeline.length) return;
     timeline[0].el.before(caret);
 
     let i = 0;
@@ -1276,15 +1265,17 @@
 
     const wrap = document.createElement("div");
     wrap.className = "to-top";
-    wrap.innerHTML =
-      '<button class="to-top__btn" type="button" aria-label="Back to top" data-tooltip="Back to top">' +
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" ' +
-      'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-      '<path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg></button>';
+    wrap.innerHTML = `
+      <button class="to-top__btn" type="button" aria-label="Back to top" data-tooltip="Back to top">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 19V5"/><path d="m5 12 7-7 7 7"/>
+        </svg>
+      </button>`;
     document.body.appendChild(wrap);
 
     wrap.querySelector("button").addEventListener("click", () => {
-      window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+      window.scrollTo({ top: 0, behavior: reduceMotion() ? "auto" : "smooth" });
     });
 
     const show = (on) => wrap.classList.toggle("is-visible", on);
