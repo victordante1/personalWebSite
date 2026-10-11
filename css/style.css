@@ -1364,6 +1364,7 @@ a.info__value:hover { text-decoration-thickness: 2px; }
   --date-col: 104px;
   --mark-col: 56px;
   --tab-h: 56px;
+  --lip: 16px;                    /* faixa da pasta que aparece entre duas abas */
   margin: 0;
   padding: 0;
   list-style: none;
@@ -1376,7 +1377,7 @@ a.info__value:hover { text-decoration-thickness: 2px; }
   align-items: start;
   pointer-events: none;            /* só a aba e o painel recebem o mouse */
 }
-.timeline__item + .timeline__item { margin-top: -12px; }   /* pastas empilhadas */
+.timeline__item + .timeline__item { margin-top: calc(-1 * var(--tab-h)); }   /* a aba cai sobre o corpo da pasta anterior */
 
 .timeline__item--green  { --c: var(--green); }
 .timeline__item--blue   { --c: var(--blue); }
@@ -1389,7 +1390,7 @@ a.info__value:hover { text-decoration-thickness: 2px; }
   position: absolute;
   left: calc(var(--date-col) + var(--mark-col) / 2);
   top: calc(var(--tab-h) / 2);
-  bottom: -16px;
+  bottom: calc(var(--tab-h) / 2);
   width: 1px;
   background: rgb(0 0 0 / 0.25);
 }
@@ -1436,20 +1437,43 @@ a.info__value:hover { text-decoration-thickness: 2px; }
 }
 
 .folder__tab {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  width: min(100%, 380px);
+  width: min(100%, max(300px, 60%));
   height: var(--tab-h);
-  padding: 0 44px 0 20px;
-  background: var(--tone);
-  border-radius: var(--radius-md) var(--radius-md) 0 0;
-  clip-path: polygon(0 0, calc(100% - 28px) 0, 100% 100%, 0 100%);
+  padding: 0 64px 0 20px;
   pointer-events: auto;
   user-select: none;
   -webkit-user-select: none;
 }
+
+/* Corpo da aba: canto superior esquerdo com o mesmo raio do resto do site */
+.folder__tab::before {
+  content: "";
+  position: absolute;
+  inset: 0 53px 0 0;
+  background: var(--tone);
+  border-radius: var(--radius-md) 0 0 0;
+}
+
+/* Ponta inclinada: canto de cima e encaixe no painel arredondados (raio 12) */
+.folder__tab::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 54px;
+  height: 100%;
+  background: var(--tone);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 54 56' preserveAspectRatio='none'%3E%3Cpath d='M0 0H6Q18 0 22.73 11.03L37.27 44.97Q42 56 54 56H0Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 54 56' preserveAspectRatio='none'%3E%3Cpath d='M0 0H6Q18 0 22.73 11.03L37.27 44.97Q42 56 54 56H0Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat;
+}
+
+.folder__name,
+.folder__chev { position: relative; z-index: 1; }
 
 .folder__name {
   font-size: var(--fs-title);
@@ -1472,12 +1496,13 @@ a.info__value:hover { text-decoration-thickness: 2px; }
 .folder__panel {
   display: grid;
   grid-template-rows: 0fr;
-  padding-bottom: 18px;            /* a "borda" visível da pasta fechada */
+  padding-bottom: calc(var(--tab-h) + var(--lip));   /* o corpo segue por trás da aba da próxima pasta */
   background: var(--tone);
   border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md);
   pointer-events: auto;
   transition: grid-template-rows 0.45s var(--ease);
 }
+.timeline__item:last-child .folder__panel { padding-bottom: var(--lip); }   /* a última não tem pasta na frente */
 .folder__inner { min-height: 0; overflow: hidden; }
 
 .folder__content {
@@ -1594,6 +1619,7 @@ a.info__value:hover { text-decoration-thickness: 2px; }
   .timeline { --date-col: 0px; }
   .timeline__item { grid-template-columns: 24px minmax(0, 1fr); }
   .timeline__item + .timeline__item { margin-top: 22px; }   /* sem sobreposição: a data fica acima */
+  .timeline .folder__panel { padding-bottom: var(--lip); }
   .timeline__item:not(:last-child)::before {
     left: 6px;
     top: 10px;
