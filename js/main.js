@@ -6,6 +6,7 @@
    5 Texto que embaralha (clique)        6 Identidade da página About (riscar e mover)
    7 Navbar: marcador da página atual    8 Texto da home sendo digitado
    9 Voltar ao topo                      10 Experiência: pastas que abrem (About)
+   11 Vídeos das páginas de projeto
 
    Um único script clássico (sem type="module") de propósito: módulos ES não
    carregam quando o site é aberto direto do disco (file://).
@@ -1315,6 +1316,28 @@
     });
   }
 
+  /* 11. VÍDEOS DAS PÁGINAS DE PROJETO --------------------------------------- */
+  // As animações dos projetos são vídeos em loop (bem mais leves que GIF).
+  // Só tocam quando aparecem na tela e ficam parados (no poster) com movimento reduzido.
+  function initCaseVideos() {
+    const videos = Array.from(document.querySelectorAll("video[data-loop]"));
+    if (!videos.length) return;
+
+    const stopAll = () => videos.forEach((v) => { v.pause(); v.removeAttribute("autoplay"); });
+    if (reduceMotion()) { stopAll(); return; }
+    motionQuery.addEventListener?.("change", () => { if (reduceMotion()) stopAll(); });
+
+    if (!("IntersectionObserver" in window)) return;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(({ target, isIntersecting }) => {
+        if (reduceMotion()) return;
+        if (isIntersecting) target.play().catch(() => {});
+        else target.pause();
+      });
+    }, { threshold: 0.15 });
+    videos.forEach((v) => io.observe(v));
+  }
+
   initBackToTop();
   initTypewriter();
   initNav();
@@ -1325,4 +1348,5 @@
   initIdCard();
   initNavSlider();
   initFolders();
+  initCaseVideos();
 })();
