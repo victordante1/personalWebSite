@@ -21,6 +21,9 @@
 
   const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
+  // Textos criados aqui passam pelo dicionário do i18n.js (sem ele, ficam em inglês)
+  const t = window.i18n ? window.i18n.t : (text) => text;
+
   // Setas do teclado -> deslocamento [dx, dy] multiplicado por step (null se não for seta)
   const ARROWS = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
   const arrowDelta = (e, step) => {
@@ -126,7 +129,7 @@
     // ou um slot cujo card está solto por aí. Dentro dele o card é puxado para o tracejado e,
     // se soltar ali, encaixa. Slots ocupados não atraem nem aceitam: o card só fica por cima.
     const MAGNET_RATIO = 0.5;
-    const SLOT_TEXT = "cool project here";
+    const SLOT_TEXT = t("cool project here");
     const CORNERS = ["peel-tl", "peel-tr", "peel-bl", "peel-br"];
 
     // Cada card ganha um "slot" no grid: um contorno tracejado, no formato do card,
@@ -531,11 +534,11 @@
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     const rules = {
-      name: (v) => (v ? "" : "Enter your name."),
+      name: (v) => (v ? "" : t("Enter your name.")),
       email: (v) =>
-        !v ? "Enter your email." : emailPattern.test(v) ? "" : "Enter a valid email, like name@domain.com.",
-      subject: (v) => (v ? "" : "Enter a subject."),
-      message: (v) => (v.length >= 10 ? "" : "Write at least 10 characters."),
+        !v ? t("Enter your email.") : emailPattern.test(v) ? "" : t("Enter a valid email, like name@domain.com."),
+      subject: (v) => (v ? "" : t("Enter a subject.")),
+      message: (v) => (v.length >= 10 ? "" : t("Write at least 10 characters.")),
     };
     const fields = Object.keys(rules);
     const valueOf = (name) => form.elements[name].value.trim();
@@ -565,14 +568,14 @@
       const invalid = fields.filter((name) => !validateField(name));
       if (invalid.length) {
         form.elements[invalid[0]].focus();
-        status.textContent = "Fix the highlighted fields and send again.";
+        status.textContent = t("Fix the highlighted fields and send again.");
         return;
       }
 
       // --- trocar aqui por fetch() quando houver back-end ---
       const body = `${valueOf("message")}\n\n${valueOf("name")}\n${valueOf("email")}`;
       window.location.href = `mailto:${to}?subject=${encodeURIComponent(valueOf("subject"))}&body=${encodeURIComponent(body)}`;
-      status.textContent = `Opening your email app. If nothing opens, write to ${to}.`;
+      status.textContent = t("Opening your email app. If nothing opens, write to {to}.", { to });
     });
   }
 
@@ -1266,8 +1269,9 @@
 
     const wrap = document.createElement("div");
     wrap.className = "to-top";
+    const label = t("Back to top");
     wrap.innerHTML = `
-      <button class="to-top__btn" type="button" aria-label="Back to top" data-tooltip="Back to top">
+      <button class="to-top__btn" type="button" aria-label="${label}" data-tooltip="${label}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M12 19V5"/><path d="m5 12 7-7 7 7"/>

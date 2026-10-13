@@ -290,6 +290,31 @@ button, input, textarea { font: inherit; color: inherit; }
 }
 .nav--sliding .nav__link[aria-current="page"].is-arriving { color: var(--black); }
 
+/* Botão de idioma (EN/PT), criado pelo i18n.js no fim da barra */
+.nav__lang {
+  margin-left: 5px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--font);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+.nav__lang::before {   /* divisória entre as páginas e o idioma */
+  content: "";
+  position: absolute;
+  left: -5px;
+  top: 10px;
+  bottom: 10px;
+  width: 1px;
+  background: rgb(0 0 0 / 0.12);
+}
+
+/* Em português, a página fica oculta só até o i18n.js trocar os textos */
+.i18n-pending body { visibility: hidden; }
+
 /* 5. HERO (HOME E PROJETO) ------------------------------------------------ */
 .hero {
   position: relative;
