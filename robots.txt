@@ -1,0 +1,6 @@
+# Victor Dante | portfólio
+User-agent: *
+Allow: /
+Disallow: /.claude/
+
+Sitemap: https://victordante1.github.io/personalWebSite/sitemap.xml
