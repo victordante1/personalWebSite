@@ -389,6 +389,110 @@
     "Red handmade lettering reading dia de pizza on cream, with a reminder that today is pizza dinner day and a pizza slice":
       "Lettering vermelho feito à mão escrito dia de pizza sobre creme, com um lembrete de que hoje é dia de jantar pizza e uma fatia de pizza",
     "Previous project: System Idiomas": "Projeto anterior: System Idiomas",
+    "Next project: Freela | Motion": "Próximo projeto: Freela | Motion",
+
+    /* Projeto: Freela | Motion ------------------------------------------------ */
+    "Freela | Motion": "Freela | Motion",
+    "A kinetic typography piece in After Effects: the word \"Freela\" switches typefaces to say I'm open for freelance work.":
+      "Uma peça de tipografia cinética no After Effects: a palavra \"Freela\" troca de fonte para avisar que estou aberto a freelas.",
+    ": Freela motion": ": motion Freela",
+    "Freela | Motion | Victor Dante": "Freela | Motion | Victor Dante",
+    "Freela, a kinetic typography piece by Victor Dante made in After Effects: the word Freela switches between typefaces to say he is open for freelance work.":
+      "Freela, uma peça de tipografia cinética de Victor Dante feita no After Effects: a palavra Freela troca de fonte para avisar que ele está aberto a freelas.",
+    "A short kinetic typography piece made in After Effects to say I'm open for freelance work: the word \"Freela\" keeps changing its typeface, from pixel to script and back.":
+      "Uma peça curta de tipografia cinética feita no After Effects para avisar que estou aberto a freelas: a palavra \"Freela\" não para de trocar de fonte, do pixel ao script e de volta.",
+    "Animation of the word Freela switching between pixel and script typefaces": "Animação da palavra Freela alternando entre fontes pixel e script",
+    "Motion design": "Motion design",
+    "Personal project": "Projeto pessoal",
+    "Kinetic typography in After Effects": "Tipografia cinética no After Effects",
+    "\"Manda freela\" is how Brazilians ask for freelance work. This piece turns that line into motion: on a dark, paper-like background, the word \"Freela\" jumps between a pixel sans-serif and a pixel script, while a short note introduces me as a graphic designer, UI/UX designer and creative developer who is available for new projects.":
+      "\"Manda freela\" é o jeito brasileiro de pedir trabalho freelance. Esta peça transforma essa frase em movimento: sobre um fundo escuro com textura de papel, a palavra \"Freela\" pula entre uma fonte pixel sem serifa e uma pixel script, enquanto um texto curto me apresenta como designer gráfico, designer UI/UX e desenvolvedor criativo disponível para novos projetos.",
+    "Freela animation: the word Freela switching between pixel and script typefaces on a dark background":
+      "Animação Freela: a palavra Freela alternando entre fontes pixel e script sobre fundo escuro",
+    "Previous project: Clauss": "Projeto anterior: Clauss",
+    "Read about the comic": "Saiba mais sobre a HQ",
+
+    /* SEO: títulos, descrições, H1 ocultos e textos alternativos ---------- */
+    "Victor Dante | Graphic Designer & Front-end Developer":
+      "Victor Dante | Designer Gráfico e Desenvolvedor Front-end",
+    "Portfolio of Victor Dante, graphic designer, UI/UX designer and front-end developer in Maceió, Brazil. Visual identity, motion design and websites.":
+      "Portfólio de Victor Dante, designer gráfico, designer UI/UX e desenvolvedor front-end em Maceió, Alagoas. Identidade visual, motion design e sites.",
+    "Victor Dante: graphic designer, UI/UX designer and front-end developer in Maceió, Brazil":
+      "Victor Dante: designer gráfico, designer UI/UX e desenvolvedor front-end em Maceió, Alagoas",
+    "Black and white portrait of Victor Dante":
+      "Retrato em preto e branco de Victor Dante",
+    "Work: Branding, Motion & Web Design | Victor Dante":
+      "Trabalhos: Branding, Motion e Web Design | Victor Dante",
+    "Selected projects by Victor Dante: visual identities, rebranding, motion design, social media and institutional campaigns for brands in Brazil.":
+      "Projetos de Victor Dante: identidades visuais, rebranding, motion design, redes sociais e campanhas institucionais para marcas no Brasil.",
+    "Work: branding, motion and web design projects by Victor Dante":
+      "Trabalhos: projetos de branding, motion e web design de Victor Dante",
+    "About Victor Dante | Designer & Developer in Maceió":
+      "Sobre Victor Dante | Designer e Desenvolvedor em Maceió",
+    "Victor Dante is a designer in Maceió, Brazil, working across visual design, UI/UX and front-end development. Skills, tools, experience and education.":
+      "Victor Dante é designer em Maceió, Alagoas, e atua com design visual, UI/UX e desenvolvimento front-end. Habilidades, ferramentas, experiência e formação.",
+    "dante: Personal Visual Identity | Victor Dante":
+      "dante: Identidade Visual Pessoal | Victor Dante",
+    "dante, the personal brand of Victor Dante: a lowercase d logo filled with textures and color, with palette, typography, motion and printed applications.":
+      "dante, a marca pessoal de Victor Dante: um logo em d minúsculo preenchido com texturas e cores, com paleta, tipografia, motion e aplicações impressas.",
+    "Pera Pera: Book Brand Identity & Packaging | Victor Dante":
+      "Pera Pera: Identidade Visual e Embalagens | Victor Dante",
+    "Visual identity for Pera Pera, a book brand: Japanese wordmark, color palette, packaging, book bands, business cards and stationery by Victor Dante.":
+      "Identidade visual da Pera Pera, uma marca de livros: logotipo japonês, paleta de cores, embalagens, cintas de livro, cartões e papelaria por Victor Dante.",
+    "TRE-AL Institutional Design & Campaigns | Victor Dante":
+      "TRE-AL: Design Institucional e Campanhas | Victor Dante",
+    "Institutional design for TRE-AL, the Regional Electoral Court of Alagoas: Elections 2026 campaign, 30 years of the electronic voting machine and social posts.":
+      "Design institucional para o TRE-AL, Tribunal Regional Eleitoral de Alagoas: campanha Eleições 2026, 30 anos da urna eletrônica e posts para redes sociais.",
+    "Dona Maria: Comic Book Against Fake News | Victor Dante":
+      "Dona Maria: HQ Contra Fake News | Victor Dante",
+    "Dona Maria e o Segredo da Informação de Verdade, a free digital comic book by TRE-AL that helps older people spot fake news. Design by Victor Dante.":
+      "Dona Maria e o Segredo da Informação de Verdade, revista digital gratuita do TRE-AL que ajuda pessoas idosas a identificar fake news. Design de Victor Dante.",
+    "System Idiomas: Social Media & Flyer Design | Victor Dante":
+      "System Idiomas: Design para Redes Sociais | Victor Dante",
+    "Social media posts and event flyers for System Idiomas, a language school, built around the brand's red and custom lettering. Design by Victor Dante.":
+      "Posts para redes sociais e flyers de eventos da System Idiomas, escola de idiomas, com o vermelho da marca e letterings próprios. Design de Victor Dante.",
+    "Clauss Pizzaria: Rebranding & Logo Design | Victor Dante":
+      "Clauss Pizzaria: Rebranding e Logo | Victor Dante",
+    "Rebranding for Clauss Pizzaria by Victor Dante: crest logo with a pizza slice, red, green and cream palette, typography and lettering for social media.":
+      "Rebranding da Clauss Pizzaria por Victor Dante: logo em brasão com fatia de pizza, paleta vermelha, verde e creme, tipografia e lettering para redes sociais.",
+    "Freela: Kinetic Typography in After Effects | Victor Dante":
+      "Freela: Tipografia Cinética no After Effects | Victor Dante",
+    "Freela, a kinetic typography motion piece made in After Effects by Victor Dante: the word Freela switches typefaces to announce freelance availability.":
+      "Freela, peça de motion com tipografia cinética feita no After Effects por Victor Dante: a palavra Freela troca de fonte para anunciar que ele está aberto a freelas.",
+    "Paper Toys: After Effects Motion Study | Victor Dante":
+      "Paper Toys: Estudo de Motion no After Effects | Victor Dante",
+    "Paper Toys, an After Effects motion study by Victor Dante: a chain of halftone paper dolls holding hands, inspired by All His Children, by Mike Burton.":
+      "Paper Toys, estudo de motion no After Effects por Victor Dante: uma corrente de bonecos de papel em retícula de mãos dadas, inspirada em All His Children, de Mike Burton.",
+    "An After Effects motion study inspired by \"The Atlantic - All His Children\", by Mike Burton: a chain of paper dolls holding hands that says \"let's work together\".":
+      "Um estudo de motion no After Effects inspirado em \"The Atlantic - All His Children\", de Mike Burton: uma corrente de bonecos de papel de mãos dadas que diz \"let's work together\" (vamos trabalhar juntos).",
+    "Animation of three halftone paper dolls holding hands above the words let's work together":
+      "Animação de três bonecos de papel em retícula de mãos dadas acima das palavras let's work together",
+    "Animation in After Effects":
+      "Animação no After Effects",
+    "A motion study made in After Effects, inspired by \"The Atlantic - All His Children\", by Mike Burton. Three paper dolls cut from the same strip hold hands in a loop, their halftone texture shifting from frame to frame, above the words \"let's work together\".":
+      "Um estudo de motion feito no After Effects, inspirado em \"The Atlantic - All His Children\", de Mike Burton. Três bonecos de papel recortados da mesma tira dão as mãos em loop, com a textura de retícula mudando a cada quadro, acima das palavras \"let's work together\" (vamos trabalhar juntos).",
+    "Paper Toys animation: three halftone paper dolls holding hands above the words let's work together":
+      "Animação Paper Toys: três bonecos de papel em retícula de mãos dadas acima das palavras let's work together",
+    "Previous project: Freela | Motion":
+      "Projeto anterior: Freela | Motion",
+    "Next project: Paper Toys":
+      "Próximo projeto: Paper Toys",
+    "Three halftone paper dolls holding hands, from the Paper Toys motion study":
+      "Três bonecos de papel em retícula de mãos dadas, do estudo de motion Paper Toys",
+    "dante logo on a vintage TV screen":
+      "Logo dante na tela de uma TV antiga",
+    "Pera Pera logo and visual identity":
+      "Logo e identidade visual da Pera Pera",
+    "TRE-AL Elections 2026 campaign post":
+      "Post da campanha Eleições 2026 do TRE-AL",
+    "Open Dona Maria comic book":
+      "Revista em quadrinhos Dona Maria aberta",
+    "Red System Idiomas social media posts":
+      "Posts vermelhos da System Idiomas para redes sociais",
+    "The word Freela animated in pixel typefaces":
+      "A palavra Freela animada em fontes pixel",
+    "dante logo spelled with fruit and sticker shapes":
+      "Logo dante escrito com frutas e adesivos",
   };
 
   /* Idioma atual ------------------------------------------------------------ */

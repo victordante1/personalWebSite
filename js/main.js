@@ -21,6 +21,13 @@
 
   const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
+  // matchMedia: Safari < 14 só tem addListener (sem addEventListener). Sem isso o
+  // script quebrava ali e as funções seguintes (formulário, foto, etc.) nem rodavam.
+  const onMediaChange = (mq, fn) => {
+    if (mq.addEventListener) mq.addEventListener("change", fn);
+    else if (mq.addListener) mq.addListener(fn);
+  };
+
   // Textos criados aqui passam pelo dicionário do i18n.js (sem ele, ficam em inglês)
   const t = window.i18n ? window.i18n.t : (text) => text;
 
@@ -508,7 +515,7 @@
         }
       });
     };
-    noDrag.addEventListener("change", syncDragMode);
+    onMediaChange(noDrag, syncDragMode);
     syncDragMode();
 
     // Ao redimensionar, mantém os cards dentro da página
@@ -1329,7 +1336,7 @@
 
     const stopAll = () => videos.forEach((v) => { v.pause(); v.removeAttribute("autoplay"); });
     if (reduceMotion()) { stopAll(); return; }
-    motionQuery.addEventListener?.("change", () => { if (reduceMotion()) stopAll(); });
+    onMediaChange(motionQuery, () => { if (reduceMotion()) stopAll(); });
 
     if (!("IntersectionObserver" in window)) return;
     const io = new IntersectionObserver((entries) => {
@@ -1342,15 +1349,20 @@
     videos.forEach((v) => io.observe(v));
   }
 
-  initBackToTop();
-  initTypewriter();
-  initNav();
-  initDraggableCards();
-  initContactForm();
-  initFreeTransform();
-  initTextScramble();
-  initIdCard();
-  initNavSlider();
-  initFolders();
-  initCaseVideos();
+  // Cada parte roda isolada: se uma falhar num navegador antigo, as outras seguem funcionando
+  [
+    initBackToTop,
+    initTypewriter,
+    initNav,
+    initDraggableCards,
+    initContactForm,
+    initFreeTransform,
+    initTextScramble,
+    initIdCard,
+    initNavSlider,
+    initFolders,
+    initCaseVideos,
+  ].forEach((init) => {
+    try { init(); } catch (err) { if (window.console) console.error(err); }
+  });
 })();
