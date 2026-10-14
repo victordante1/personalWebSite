@@ -195,8 +195,15 @@ button, input, textarea { font: inherit; color: inherit; }
 .nav {
   position: fixed;
   top: 20px;
-  left: 50%;
-  translate: -50% 0;
+  /* Centralizada sem "translate" (propriedade que navegadores antigos ignoram,
+     deixando a barra deslocada para a direita) e sem transform (o JS usa no fade) */
+  left: 0;
+  right: 0;
+  width: -webkit-max-content;
+  width: max-content;
+  margin-inline: auto;
+  margin-left: auto;
+  margin-right: auto;
   z-index: 100;
   display: flex;
   gap: 4px;
@@ -313,16 +320,18 @@ button, input, textarea { font: inherit; color: inherit; }
 }
 
 /* Em português, a página fica oculta só até o i18n.js trocar os textos */
-.i18n-pending body { visibility: hidden; }
+.i18n-pending body { visibility: hidden; animation: tw-failsafe 0s 2.5s forwards; }   /* se o JS falhar, a página aparece mesmo assim */
 
 /* 5. HERO (HOME E PROJETO) ------------------------------------------------ */
 .hero {
   position: relative;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;              /* navegadores antigos não conhecem svh */
   min-height: 100svh;
   padding: 120px var(--pad) 32px;
   background: var(--black);
+  overflow-x: hidden;             /* fallback para quem não conhece "clip" */
   overflow-x: clip;               /* evita barra de rolagem horizontal quando o "d" passa da borda */
 }
 .hero :focus-visible { outline-color: var(--white); }
@@ -362,19 +371,24 @@ button, input, textarea { font: inherit; color: inherit; }
   aspect-ratio: 1;
 }
 .hero__visual .ph { position: absolute; }
-.hero__visual .ph--main { inset: 0; border-radius: var(--radius); }
+.hero__visual .ph--main { top: 0; right: 0; bottom: 0; left: 0; border-radius: var(--radius); }
 
 /* Home: o "d" (GIF) dita o tamanho do bloco e a foto flutua por cima */
+/* O GIF tem muita transparência nas laterais: a perna do "d" termina em ~65,5%
+   da largura. O bloco é empurrado 34,5% da própria largura para a direita, então
+   o "d" termina sempre alinhado à borda direita do conteúdo (a mesma do
+   "Maceió, Brazil"), em qualquer largura de tela. Antes, left: 37% + margem
+   negativa cortavam o "d" na borda em telas de 1300 a 1600px (ex.: 1366x768). */
 body[data-page="home"] .hero__visual {
   width: clamp(420px, 50vw, 900px);   /* tamanho do "d": mude o valor do meio (50vw) */
   aspect-ratio: auto;
-  margin-right: -8%;
-  left: 37%;
+  -webkit-transform: translateX(34.5%);
+  transform: translateX(34.5%);
 }
 
 .hero-arrows {
   position: relative;
-  left: 80px;
+  display: block;                     /* vídeo é inline por padrão: evita o vão abaixo */
   width: 100%;
   max-width: none;
   height: auto;
@@ -383,7 +397,7 @@ body[data-page="home"] .hero__visual {
 /* Foto com transformação livre (o JS grava left/top/width/height inline em %) */
 .hero-photo {
   position: absolute;
-  left: 28%;                          /* valores negativos empurram a foto para fora do "d" */
+  left: 19.1%;                        /* valores negativos empurram a foto para fora do "d" */
   top: 18%;
   width: 22%;
   z-index: 2;
@@ -402,7 +416,7 @@ body[data-page="home"] .hero__visual {
 
 .hero-photo__box {
   position: absolute;
-  inset: 0;
+  top: 0; right: 0; bottom: 0; left: 0;
   display: none;
   border: 1px solid var(--blue);
   pointer-events: none;
@@ -418,7 +432,7 @@ body[data-page="home"] .hero__visual {
   pointer-events: auto;
   touch-action: none;
 }
-.hero-photo__handle::before { content: ""; position: absolute; inset: -9px; } /* área de clique maior */
+.hero-photo__handle::before { content: ""; position: absolute; top: -9px; right: -9px; bottom: -9px; left: -9px; } /* área de clique maior */
 .hero-photo__handle[data-dir="nw"] { left: 0;    top: 0;    cursor: nwse-resize; }
 .hero-photo__handle[data-dir="n"]  { left: 50%;  top: 0;    cursor: ns-resize; }
 .hero-photo__handle[data-dir="ne"] { left: 100%; top: 0;    cursor: nesw-resize; }
@@ -527,7 +541,7 @@ body[data-page="projects"] .card { animation: pop 0.6s var(--ease) calc(0.15s + 
 /* Imagem real: ocupa todo o box */
 .card__media img {
   position: absolute;
-  inset: 0;
+  top: 0; right: 0; bottom: 0; left: 0;
   width: 100%;
   height: 100%;
   max-width: none;
@@ -590,7 +604,7 @@ body[data-page="projects"] .card { animation: pop 0.6s var(--ease) calc(0.15s + 
 .card-slot > .card { flex: 1; }
 .card-slot__ghost {
   position: absolute;
-  inset: 0;
+  top: 0; right: 0; bottom: 0; left: 0;
   display: grid;
   place-items: center;
   padding: 16px;
@@ -697,7 +711,7 @@ body[data-page="projects"] .card { animation: pop 0.6s var(--ease) calc(0.15s + 
 .hero--case { min-height: 0; padding-bottom: clamp(72px, 9vw, 120px); }
 .hero--case .hero__visual { width: min(100%, 500px); }
 
-.card-stack { position: absolute; inset: 0; }
+.card-stack { position: absolute; top: 0; right: 0; bottom: 0; left: 0; }
 .card-stack__card {
   position: absolute;
   width: 62%;
@@ -706,31 +720,32 @@ body[data-page="projects"] .card { animation: pop 0.6s var(--ease) calc(0.15s + 
   border-radius: 16px;
   background: var(--panel);
   box-shadow: 0 24px 48px rgb(0 0 0 / 0.5);
-  transition: rotate 0.5s var(--ease), translate 0.5s var(--ease);
+  transform: rotate(var(--r, 0deg));
+  transition: transform 0.5s var(--ease);
   animation: card-in 0.8s var(--ease) backwards;
 }
 .card-stack__card.ph { position: absolute; background: var(--ph-bg); }
-.card-stack__card--back { top: 3%; left: 3%; rotate: -5deg; animation-delay: 0.1s; }
-.card-stack__card--front { right: 3%; bottom: 3%; rotate: 3deg; animation-delay: 0.25s; }
+.card-stack__card--back { top: 3%; left: 3%; --r: -5deg; animation-delay: 0.1s; }
+.card-stack__card--front { right: 3%; bottom: 3%; --r: 3deg; animation-delay: 0.25s; }
 .card-stack__card img,
 .card-stack__card video {
   position: absolute;
-  inset: 0;
+  top: 0; right: 0; bottom: 0; left: 0;
   width: 100%;
   height: 100%;
   max-width: none;
   object-fit: cover;
 }
 @media (hover: hover) {
-  .card-stack:hover .card-stack__card--back { rotate: -8deg; translate: -3% -1%; }
-  .card-stack:hover .card-stack__card--front { rotate: 5deg; translate: 3% 1%; }
+  .card-stack:hover .card-stack__card--back { transform: translate(-3%, -1%) rotate(-8deg); }
+  .card-stack:hover .card-stack__card--front { transform: translate(3%, 1%) rotate(5deg); }
 }
-@keyframes card-in { from { opacity: 0; translate: 0 32px; } }
+@keyframes card-in { from { opacity: 0; transform: translateY(32px) rotate(var(--r, 0deg)); } }
 
 /* Capa real no hero do projeto (imagem ou vídeo preenchendo o quadrado) */
 .case-cover {
   position: absolute;
-  inset: 0;
+  top: 0; right: 0; bottom: 0; left: 0;
   width: 100%;
   height: 100%;
   max-width: none;
@@ -819,7 +834,7 @@ body[data-page="projects"] .card { animation: pop 0.6s var(--ease) calc(0.15s + 
 .highlight__media { position: relative; overflow: hidden; }
 .highlight__media > img {
   position: absolute;
-  inset: 0;
+  top: 0; right: 0; bottom: 0; left: 0;
   width: 100%;
   height: 100%;
   max-width: none;
@@ -832,9 +847,11 @@ body[data-page="projects"] .card { animation: pop 0.6s var(--ease) calc(0.15s + 
   display: flex;
   justify-content: center;
   align-items: center;
+  min-height: 100vh;
   min-height: 100svh;
   padding-inline: var(--pad);
   background: var(--green);
+  overflow-x: hidden;
   overflow-x: clip;
 }
 
@@ -861,7 +878,7 @@ body[data-page="projects"] .card { animation: pop 0.6s var(--ease) calc(0.15s + 
 .id-card.is-ready img { visibility: hidden; }   /* o canvas assume a imagem */
 .id-card__canvas {
   position: absolute;
-  inset: 0;
+  top: 0; right: 0; bottom: 0; left: 0;
   width: 100%;
   height: 100%;
   transform: rotate(2deg);
@@ -1083,10 +1100,10 @@ body[data-page="projects"] .card { animation: pop 0.6s var(--ease) calc(0.15s + 
 }
 .timeline__item + .timeline__item { margin-top: calc(-1 * var(--tab-h)); }   /* a aba cai sobre o corpo da pasta anterior */
 
-.timeline__item--green  { --c: var(--green); }
-.timeline__item--blue   { --c: var(--blue); }
-.timeline__item--yellow { --c: var(--yellow); }
-.timeline__item--red    { --c: var(--red); }
+.timeline__item--green  { --c: var(--green);  --tone-fb: #9ae39a; }
+.timeline__item--blue   { --c: var(--blue);   --tone-fb: #99e1f3; }
+.timeline__item--yellow { --c: var(--yellow); --tone-fb: #fedf9d; }
+.timeline__item--red    { --c: var(--red);    --tone-fb: #ffb1b1; }
 
 /* Linha: do marcador deste item até o marcador do próximo */
 .timeline__item:not(:last-child)::before {
@@ -1129,7 +1146,7 @@ body[data-page="projects"] .card { animation: pop 0.6s var(--ease) calc(0.15s + 
 
 /* Pasta: aba + painel. Fechada mostra a aba e uma borda; aberta revela o conteúdo */
 .folder {
-  --tone: color-mix(in srgb, var(--c) 40%, white);   /* cor da paleta, mais clara */
+  --tone: var(--tone-fb, #e2e2e2);   /* mesma mistura já calculada, para navegadores sem color-mix */
   position: relative;
   outline: none;
   filter: drop-shadow(0 -2px 3px rgb(0 0 0 / 0.08));
@@ -1158,7 +1175,7 @@ body[data-page="projects"] .card { animation: pop 0.6s var(--ease) calc(0.15s + 
 .folder__tab::before {
   content: "";
   position: absolute;
-  inset: 0 53px 0 0;
+  top: 0; right: 53px; bottom: 0; left: 0;
   background: var(--tone);
   border-radius: var(--radius) 0 0 0;
 }
@@ -1216,14 +1233,19 @@ body[data-page="projects"] .card { animation: pop 0.6s var(--ease) calc(0.15s + 
   transition: opacity 0.25s var(--ease), transform 0.45s var(--ease);
 }
 
-/* Aberta: foco por teclado ou toque (classe is-open via JS); hover logo abaixo */
-.folder:is(.is-open, :focus-visible) .folder__panel { grid-template-rows: 1fr; }
-.folder:is(.is-open, :focus-visible) .folder__content {
-  opacity: 1;
-  transform: none;
-  transition-delay: 0.1s;
+@supports (color: color-mix(in srgb, red 50%, white)) {
+  .folder { --tone: color-mix(in srgb, var(--c) 40%, white); }   /* cor da paleta, mais clara */
 }
-.folder:is(.is-open, :focus-visible) .folder__chev { transform: rotate(45deg); }
+
+/* Aberta: toque (classe is-open via JS) ou foco por teclado; hover logo abaixo.
+   Regras separadas de propósito: navegadores sem :is() ou :focus-visible
+   descartariam a regra inteira e a pasta nunca abriria. */
+.folder.is-open .folder__panel { grid-template-rows: 1fr; }
+.folder.is-open .folder__content { opacity: 1; transform: none; transition-delay: 0.1s; }
+.folder.is-open .folder__chev { transform: rotate(45deg); }
+.folder:focus-visible .folder__panel { grid-template-rows: 1fr; }
+.folder:focus-visible .folder__content { opacity: 1; transform: none; transition-delay: 0.1s; }
+.folder:focus-visible .folder__chev { transform: rotate(45deg); }
 
 @media (hover: hover) and (pointer: fine) {
   .folder:hover .folder__panel { grid-template-rows: 1fr; }
@@ -1512,16 +1534,6 @@ a.info__value:hover { text-decoration-thickness: 2px; }
   .to-top__btn::after { display: none; }
 }
 
-/* Abaixo de 1300px o "d" deixa de sangrar para fora da tela */
-@media (max-width: 1299px) {
-  body[data-page="home"] .hero__visual {
-    width: min(100%, 560px);
-    margin-right: 0;
-    left: 0;
-  }
-  .hero-arrows { left: 0; }
-}
-
 @media (max-width: 1100px) {
   .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
@@ -1535,6 +1547,15 @@ a.info__value:hover { text-decoration-thickness: 2px; }
   .card[data-drag] .card__media { touch-action: auto; }
   body[data-page="projects"] .projects-head { display: none; } /* esconde a dica "Drag the cards" */
 
+  /* About: o cartão ganha respiro nas laterais */
+  .hero-photo-about { width: min(86%, 760px); }
+
+  .contact__grid { grid-template-columns: 1fr; }
+}
+
+/* Hero em uma coluna só em telas estreitas (celular, tablet em pé). Antes isso
+   começava em 1100px e, em monitores 1024x768, o "Hello!" ficava abaixo da dobra. */
+@media (max-width: 900px) {
   .hero__inner { grid-template-columns: minmax(0, 1fr); gap: 24px; align-content: center; } /* linhas juntas, sem esticar */
   .hero__visual { justify-self: center; width: min(84%, 420px); }
 
@@ -1544,21 +1565,16 @@ a.info__value:hover { text-decoration-thickness: 2px; }
   body[data-page="home"] .hero__visual {
     order: -1;
     width: min(calc((100vw - 2 * var(--pad)) * 1.7), 1000px);
-    translate: 2.75% 0;             /* centraliza o conjunto foto + "d", que fica um pouco à esquerda do centro do GIF */
+    -webkit-transform: translateX(2.75%);
+    transform: translateX(2.75%);   /* centraliza o conjunto foto + "d", que fica um pouco à esquerda do centro do GIF */
   }
+  body[data-page="home"] .hero-photo { left: 28%; }
   body[data-page="home"] .hero__text {
     justify-items: center;
     text-align: center;
   }
   body[data-page="home"] .lead { margin-inline: auto; }
 
-  /* About: o cartão ganha respiro nas laterais */
-  .hero-photo-about { width: min(86%, 760px); }
-
-  .contact__grid { grid-template-columns: 1fr; }
-}
-
-@media (max-width: 900px) {
   .about-cards { grid-template-columns: 1fr; }
 }
 
@@ -1596,6 +1612,25 @@ a.info__value:hover { text-decoration-thickness: 2px; }
   .case__facts { grid-template-columns: 1fr; }
   .contact__title { flex-direction: column; }
   .projects-head { align-items: flex-start; flex-direction: column-reverse; }
+}
+
+/* Monitores baixos (notebooks 1366x768, telas com zoom do Windows em 125-150%):
+   a área útil do navegador fica com ~600px de altura. O hero sobe um pouco e
+   os títulos grandes encolhem para o conteúdo caber sem rolar. */
+@media (min-width: 901px) and (max-height: 720px) {
+  .hero { padding-top: 96px; }
+  .hero:not(.hero--case) .hero__inner { gap: 32px; }
+  :root { --fs-display: clamp(3rem, 6.5vw, 5.5rem); }
+  .hero--case .hero__visual { width: min(100%, 420px); }
+}
+
+/* 13b. NAVEGADORES ANTIGOS ------------------------------------------------- */
+/* Sem aspect-ratio (Chrome < 88, Safari < 15) as caixas de mídia ficavam com
+   altura zero e as imagens dos cards sumiam. O padding em % reserva a mesma proporção. */
+@supports not (aspect-ratio: 1 / 1) {
+  .card__media { height: 0; padding-top: 62.5%; }                 /* 16:10 */
+  body:not([data-page="home"]) .hero__visual::before { content: ""; display: block; padding-top: 100%; }
+  .card-stack__card { height: 0; padding-top: 82.667%; }          /* 3:4 com 62% de largura */
 }
 
 /* 14. MOVIMENTO REDUZIDO -------------------------------------------------- */
