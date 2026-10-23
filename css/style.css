@@ -727,6 +727,13 @@ body[data-page="projects"] .card { animation: pop 0.6s var(--ease) calc(0.15s + 
 .card-stack__card.ph { position: absolute; background: var(--ph-bg); }
 .card-stack__card--back { top: 3%; left: 3%; --r: -5deg; animation-delay: 0.1s; }
 .card-stack__card--front { right: 3%; bottom: 3%; --r: 3deg; animation-delay: 0.25s; }
+/* Mídia 16:10 com textura dentro da carta 3:4 (object-fit: contain): a imagem ocupa
+   de ~27% a ~73% da altura; as bordas dela somem no fundo, sem corte visível */
+.card-stack__card--fade img,
+.card-stack__card--fade video {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 27%, #000 36%, #000 64%, transparent 73%);
+  mask-image: linear-gradient(to bottom, transparent 27%, #000 36%, #000 64%, transparent 73%);
+}
 .card-stack__card img,
 .card-stack__card video {
   position: absolute;
