@@ -71,6 +71,13 @@
     <image:image><image:loc>https://victordante1.github.io/personalWebSite/img/og/og-freela.jpg</image:loc></image:image>
   </url>
   <url>
+    <loc>https://victordante1.github.io/personalWebSite/projeto-zip.html</loc>
+    <lastmod>2026-10-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://victordante1.github.io/personalWebSite/img/og/og-zip.jpg</image:loc></image:image>
+  </url>
+  <url>
     <loc>https://victordante1.github.io/personalWebSite/projeto-paper-toys.html</loc>
     <lastmod>2026-10-14</lastmod>
     <changefreq>yearly</changefreq>

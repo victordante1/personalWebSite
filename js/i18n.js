@@ -412,6 +412,37 @@
     "Previous project: Clauss": "Projeto anterior: Clauss",
     "Read about the comic": "Saiba mais sobre a HQ",
 
+    /* Projeto: Ícone do Zip, by LinkedIn --------------------------------------- */
+    "Icon | Zip, by LinkedIn": "Ícone | Zip, by LinkedIn",
+    "A temporary profile icon for Zip, LinkedIn's puzzle game, made after the Zip team reached out to me on LinkedIn.":
+      "Um ícone temporário para o perfil do Zip, o jogo de quebra-cabeça do LinkedIn, feito depois que o time do Zip me procurou no LinkedIn.",
+    ": Zip icon": ": ícone do Zip",
+    "Hand-drawn Zip mascot waving next to the digital Zip icon": "Mascote do Zip desenhado à mão acenando ao lado do ícone digital do Zip",
+    "Next project: Zip icon": "Próximo projeto: Ícone do Zip",
+    "Previous project: Zip icon": "Projeto anterior: Ícone do Zip",
+    "A temporary profile icon for Zip, LinkedIn's daily path puzzle. The project was born from an interaction on LinkedIn: the Zip team started a conversation with me and asked me to make it.":
+      "Um ícone temporário para o perfil do Zip, o quebra-cabeça diário de caminhos do LinkedIn. O projeto nasceu de uma interação no LinkedIn: o time do Zip puxou conversa comigo e me pediu para criá-lo.",
+    "Hand-drawn Zip mascot waving": "Mascote do Zip desenhado à mão acenando",
+    "Icon design": "Design de ícone",
+    "Zip, a puzzle by LinkedIn": "Zip, a puzzle by LinkedIn",
+    "Temporary profile icon, hand-drawn and digital versions": "Ícone temporário de perfil, nas versões desenhada à mão e digital",
+    "This one started with an interaction on LinkedIn. The team behind Zip, LinkedIn's daily puzzle game, reached out and started a conversation with me: they wanted a temporary icon for their profile page.":
+      "Este projeto começou com uma interação no LinkedIn. O time por trás do Zip, o jogo de quebra-cabeça diário do LinkedIn, entrou em contato e puxou conversa comigo: eles queriam um ícone temporário para a página deles.",
+    "The idea comes straight from the game. In Zip you complete a single path through the grid, so the icon's character is that path: a winding orange line with a white dot at each end, bending into the shape of a Z and doubling as a smiling face.":
+      "A ideia vem direto do jogo. No Zip você completa um único caminho pela grade, então o personagem do ícone é esse caminho: uma linha laranja sinuosa com um ponto branco em cada ponta, que se dobra no formato de um Z e vira também um rosto sorridente.",
+    "Two versions": "Duas versões",
+    "I sent the team two versions of the same idea. The first is hand-drawn: the path becomes a little tile with arms and legs, waving hello with loose, wobbly outlines. The second is a clean digital version that keeps only the essentials, the path, the two dots and the face, with a soft orange gradient on a peach background.":
+      "Mandei para o time duas versões da mesma ideia. A primeira é desenhada à mão: o caminho vira uma pequena peça com braços e pernas, acenando, com contornos soltos e tremidos. A segunda é uma versão digital e limpa que mantém só o essencial, o caminho, os dois pontos e o rosto, com um degradê laranja suave sobre um fundo pêssego.",
+    "Hand-drawn Zip mascot: an orange tile with the Zip path, a smiling face, arms and legs, waving":
+      "Mascote do Zip desenhado à mão: uma peça laranja com o caminho do Zip, um rosto sorridente, braços e pernas, acenando",
+    "Digital Zip icon: an orange path with white dots at each end and a smiling face on a peach background":
+      "Ícone digital do Zip: um caminho laranja com pontos brancos nas pontas e um rosto sorridente sobre fundo pêssego",
+    "On the profile": "No perfil",
+    "The hand-drawn version became the profile picture of the Zip, a puzzle by LinkedIn page, which has more than 58 million followers.":
+      "A versão desenhada à mão virou a foto de perfil da página Zip, a puzzle by LinkedIn, que tem mais de 58 milhões de seguidores.",
+    "Header of the Zip, a puzzle by LinkedIn page, with the hand-drawn mascot as its profile picture":
+      "Cabeçalho da página Zip, a puzzle by LinkedIn, com o mascote desenhado à mão como foto de perfil",
+
     /* SEO: títulos, descrições, H1 ocultos e textos alternativos ---------- */
     "Victor Dante | Graphic Designer & Front-end Developer":
       "Victor Dante | Designer Gráfico e Desenvolvedor Front-end",
@@ -459,6 +490,12 @@
       "Freela: Tipografia Cinética no After Effects | Victor Dante",
     "Freela, a kinetic typography motion piece made in After Effects by Victor Dante: the word Freela switches typefaces to announce freelance availability.":
       "Freela, peça de motion com tipografia cinética feita no After Effects por Victor Dante: a palavra Freela troca de fonte para anunciar que ele está aberto a freelas.",
+    "Zip, a puzzle by LinkedIn: Profile Icon | Victor Dante":
+      "Zip, a puzzle by LinkedIn: Ícone de Perfil | Victor Dante",
+    "A temporary profile icon for Zip, LinkedIn's daily puzzle game, by Victor Dante: a hand-drawn mascot and a digital version of the Zip path, born from a conversation on LinkedIn.":
+      "Um ícone temporário de perfil para o Zip, o jogo de quebra-cabeça diário do LinkedIn, por Victor Dante: um mascote desenhado à mão e uma versão digital do caminho do Zip, nascidos de uma conversa no LinkedIn.",
+    "Hand-drawn Zip mascot waving next to the digital Zip icon on a peach background":
+      "Mascote do Zip desenhado à mão acenando ao lado do ícone digital do Zip sobre fundo pêssego",
     "Paper Toys: After Effects Motion Study | Victor Dante":
       "Paper Toys: Estudo de Motion no After Effects | Victor Dante",
     "Paper Toys, an After Effects motion study by Victor Dante: a chain of halftone paper dolls holding hands, inspired by All His Children, by Mike Burton.":
