@@ -1237,8 +1237,8 @@
         timeline.push({ el: c, at: t });
         const ch = c.textContent;
         let step = base * (1 - JITTER + Math.random() * 2 * JITTER);
-        if (/[,;:]/.test(ch)) step += PAUSE_SOFT;
-        else if (/[.!?]/.test(ch)) step += PAUSE_HARD;
+        if (/[,;:、，]/.test(ch)) step += PAUSE_SOFT;
+        else if (/[.!?。！？]/.test(ch)) step += PAUSE_HARD;
         t += step;
       });
       t += GAP;

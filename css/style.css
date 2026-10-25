@@ -297,16 +297,13 @@ button, input, textarea { font: inherit; color: inherit; }
 }
 .nav--sliding .nav__link[aria-current="page"].is-arriving { color: var(--black); }
 
-/* Botão de idioma (EN/PT), criado pelo i18n.js no fim da barra */
+/* Globo de idiomas (criado pelo i18n.js no fim da barra) e o menu que ele abre */
+.nav__lang-wrap { position: relative; margin-left: 5px; }
 .nav__lang {
-  margin-left: 5px;
   padding: 0;
   border: 0;
   background: none;
   font-family: var(--font);
-  font-size: var(--fs-small);
-  font-weight: var(--fw-medium);
-  letter-spacing: 0.02em;
   cursor: pointer;
 }
 .nav__lang::before {   /* divisória entre as páginas e o idioma */
@@ -318,8 +315,58 @@ button, input, textarea { font: inherit; color: inherit; }
   width: 1px;
   background: rgb(0 0 0 / 0.12);
 }
+.nav__lang-wrap.is-open .nav__lang { background: var(--hover); }
+.nav__lang-wrap.is-open .nav__lang::after { display: none; }   /* sem tooltip com o menu aberto */
 
-/* Em português, a página fica oculta só até o i18n.js trocar os textos */
+.lang-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: -6px;
+  min-width: 168px;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-float);
+  animation: lang-menu-in 0.18s var(--ease);
+}
+.lang-menu[hidden] { display: none; }
+.lang-menu__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--black);
+  font-family: var(--font), "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+  font-size: var(--fs-small);
+  font-weight: var(--fw-regular);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s var(--ease);
+}
+.lang-menu__item:hover,
+.lang-menu__item:focus-visible { background: rgb(0 0 0 / 0.06); outline: none; }
+.lang-menu__item[aria-current] { font-weight: var(--fw-medium); }
+.lang-menu__item svg { width: 16px; height: 16px; flex: none; }
+@keyframes lang-menu-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) { .lang-menu { animation: none; } }
+
+/* Japonês: a Outfit não tem esses caracteres; o resto vem da Noto Sans JP */
+:root:lang(ja) { --font: "Outfit", "Noto Sans JP", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif; }
+:lang(ja) body { line-break: strict; }
+:lang(ja) .display { font-size: calc(var(--fs-display) * 0.78); line-height: 1.1; letter-spacing: 0; }   /* caracteres japoneses são mais largos */
+:lang(ja) .tw-word { display: inline; white-space: normal; }   /* japonês não tem espaços: quebra entre caracteres */
+
+/* Em português ou japonês, a página fica oculta só até o i18n.js trocar os textos */
 .i18n-pending body { visibility: hidden; animation: tw-failsafe 0s 2.5s forwards; }   /* se o JS falhar, a página aparece mesmo assim */
 
 /* 5. HERO (HOME E PROJETO) ------------------------------------------------ */
